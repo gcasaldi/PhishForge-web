@@ -1,5 +1,5 @@
 // Configurazione API
-const API_BASE_URL = 'https://phishforge-api.onrender.com';
+const API_BASE_URL = 'https://phishforge-lite.onrender.com/';
 
 // Esempi predefiniti
 const examples = {
