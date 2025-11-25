@@ -1,0 +1,496 @@
+/* Reset e Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #2563eb;
+    --danger-color: #dc2626;
+    --warning-color: #f59e0b;
+    --success-color: #10b981;
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--text-primary);
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.logo i {
+    font-size: 48px;
+}
+
+.header h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.tagline {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-top: 10px;
+}
+
+/* Card */
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+}
+
+.card h2, .card h3 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+/* Buttons */
+.btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-color);
+    transform: translateY(-2px);
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading p {
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+/* Risk Card */
+.risk-card {
+    text-align: center;
+}
+
+.risk-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.risk-icon i {
+    font-size: 64px;
+}
+
+.risk-info h2 {
+    font-size: 32px;
+    margin: 0;
+}
+
+.risk-info p {
+    font-size: 20px;
+    color: var(--text-secondary);
+    margin: 5px 0 0 0;
+}
+
+.risk-high .risk-icon i,
+.risk-high h2 {
+    color: var(--danger-color);
+}
+
+.risk-medium .risk-icon i,
+.risk-medium h2 {
+    color: var(--warning-color);
+}
+
+.risk-low .risk-icon i,
+.risk-low h2 {
+    color: var(--success-color);
+}
+
+/* Risk Bar */
+.risk-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-color);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.risk-bar-fill {
+    height: 100%;
+    transition: width 1s ease-out;
+    border-radius: 6px;
+}
+
+.risk-bar-fill.risk-high {
+    background: var(--danger-color);
+}
+
+.risk-bar-fill.risk-medium {
+    background: var(--warning-color);
+}
+
+.risk-bar-fill.risk-low {
+    background: var(--success-color);
+}
+
+/* Recommendation */
+.recommendation {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: 8px;
+    text-align: left;
+}
+
+.recommendation i {
+    font-size: 24px;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.recommendation p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Findings */
+.finding-item {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.finding-header {
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    position: relative;
+}
+
+.finding-header:hover {
+    background: var(--bg-color);
+}
+
+.finding-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.risk-badge {
+    background: #fee2e2;
+    color: var(--danger-color);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.finding-detail {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.finding-toggle {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    transition: transform 0.3s;
+}
+
+.finding-toggle.rotated {
+    transform: rotate(180deg);
+}
+
+.finding-content {
+    padding: 16px;
+    background: var(--bg-color);
+    border-top: 2px solid var(--border-color);
+}
+
+.finding-explanation {
+    margin-bottom: 16px;
+}
+
+.finding-tips ul {
+    margin-top: 8px;
+    padding-left: 20px;
+}
+
+.finding-tips li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* URLs */
+.urls-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.url-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-color);
+    border-radius: 8px;
+    word-break: break-all;
+}
+
+.url-item i {
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+/* Actions */
+.actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Examples */
+.examples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.example-btn {
+    padding: 16px;
+    background: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.example-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.example-btn i {
+    font-size: 20px;
+}
+
+/* Error Card */
+.error-card {
+    text-align: center;
+    color: var(--danger-color);
+}
+
+.error-card i {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.error-card h3 {
+    margin-bottom: 12px;
+}
+
+.error-card p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    color: white;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.footer p {
+    margin: 8px 0;
+    opacity: 0.9;
+}
+
+.footer-note {
+    font-size: 14px;
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0;
+    }
+    
+    .header h1 {
+        font-size: 36px;
+    }
+    
+    .logo i {
+        font-size: 36px;
+    }
+    
+    .card {
+        padding: 20px;
+    }
+    
+    .risk-header {
+        flex-direction: column;
+    }
+    
+    .risk-icon i {
+        font-size: 48px;
+    }
+    
+    .examples-grid {
+        grid-template-columns: 1fr;
+    }
+}
