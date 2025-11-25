@@ -17,6 +17,16 @@
             </div>
             <p class="tagline">Analizzatore Intelligente di Email Phishing</p>
         </header>
+        <input id="subject" placeholder="Subject">
+<input id="sender" placeholder="Sender">
+<textarea id="body" placeholder="Incolla qui il testo dell'email"></textarea>
+<button onclick="analyzeEmail()">Analizza</button>
+
+<div id="result"></div>
+<ul id="details"></ul>
+
+<script src="script.js"></script>
+
 
         <!-- Form di Analisi -->
         <div class="card form-card">
