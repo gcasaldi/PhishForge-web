@@ -288,3 +288,31 @@ async function checkApiHealth() {
 
 // Esegui health check
 checkApiHealth();
+const API_BASE_URL = "http://localhost:8000";  // backend locale
+
+async function analyzeEmail() {
+  const subject = document.getElementById("subject").value;
+  const sender = document.getElementById("sender").value;
+  const body = document.getElementById("body").value;
+
+  const resultDiv = document.getElementById("result");
+  const detailsList = document.getElementById("details");
+
+  resultDiv.textContent = "Analisi in corso...";
+  detailsList.innerHTML = "";
+
+  const resp = await fetch(`${API_BASE_URL}/analyze`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ subject, sender, body })
+  });
+
+  const data = await resp.json();
+
+  resultDiv.textContent = `Risk score: ${data.risk_score} (${data.risk_level})`;
+  data.details.forEach(d => {
+    const li = document.createElement("li");
+    li.textContent = d;
+    detailsList.appendChild(li);
+  });
+}
