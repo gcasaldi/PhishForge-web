@@ -200,6 +200,28 @@ function displayResults(data, mode = 'email') {
         high: "High risk. This message matches common phishing patterns. Do not click any links or share credentials. Treat it as a likely phishing attempt."
     };
     
+    // Italian to English message replacements (in case backend sends Italian)
+    const messageReplacements = {
+        "🚨 PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.": 
+            "🚨 DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
+        "✅ Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.": 
+            "✅ Low risk, but always double-check the domain and prefer HTTPS whenever possible.",
+        "⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.":
+            "⚠️ WARNING: This email shows typical phishing characteristics. Do not click links or provide personal information.",
+        "⚡ CAUTELA: Questa email presenta alcuni segnali sospetti. Verifica attentamente prima di intraprendere azioni.":
+            "⚡ CAUTION: This email has some suspicious signs. Verify carefully before taking action.",
+        "✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.":
+            "✅ This email appears legitimate, but always maintain a cautious attitude.",
+        "⛔ PERICOLO ELEVATO: Non cliccare sui link, non fornire informazioni personali. Elimina questa email.":
+            "⛔ HIGH DANGER: Do not click any links, do not provide personal information. Delete this email."
+    };
+    
+    // Helper function to translate Italian messages to English
+    function translateMessage(message) {
+        if (!message) return message;
+        return messageReplacements[message] || message;
+    }
+    
     // Configure colors and icons based on risk level
     let colorClass = '';
     let iconClass = '';
@@ -242,7 +264,10 @@ function displayResults(data, mode = 'email') {
     riskScore.textContent = `${data.risk_score}/100`;
     riskBarFill.style.width = `${data.risk_score}%`;
     riskBarFill.className = `risk-bar-fill ${colorClass}`;
-    recommendation.textContent = data.recommendation || recommendationText;
+    
+    // Translate recommendation if it's in Italian
+    const backendRecommendation = data.recommendation || recommendationText;
+    recommendation.textContent = translateMessage(backendRecommendation);
     
     // Details/Findings - display as bulleted list
     const findingsContainer = document.getElementById('findingsContainer');
@@ -268,10 +293,12 @@ function displayResults(data, mode = 'email') {
             
             // Handle both string and object formats
             if (typeof detail === 'string') {
-                li.textContent = detail;
+                // Translate if Italian
+                li.textContent = translateMessage(detail);
             } else if (typeof detail === 'object' && detail !== null) {
                 // Try to extract meaningful content from object
-                li.textContent = detail.message || detail.description || detail.text || JSON.stringify(detail);
+                const content = detail.message || detail.description || detail.text || JSON.stringify(detail);
+                li.textContent = translateMessage(content);
             } else {
                 li.textContent = String(detail);
             }
