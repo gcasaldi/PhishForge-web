@@ -193,63 +193,12 @@ function displayResults(data, mode = 'email') {
     // Map risk levels (handles various formats)
     const riskLevelNormalized = data.risk_level ? data.risk_level.toLowerCase() : 'low';
     
-    // Risk messages mapping
+    // Risk messages mapping - English only
     const riskMessages = {
         low: "Low risk. No clear phishing indicators were detected, but stay cautious and verify the sender if something feels unusual.",
         medium: "Medium risk. Some suspicious patterns were found. Double-check the sender and links before clicking or sharing any information.",
         high: "High risk. This message matches common phishing patterns. Do not click any links or share credentials. Treat it as a likely phishing attempt."
     };
-    
-    // Italian to English message replacements (in case backend sends Italian)
-    const messageReplacements = {
-        "🚨 PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.": 
-            "🚨 DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
-        "✅ Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.": 
-            "✅ Low risk, but always double-check the domain and prefer HTTPS whenever possible.",
-        "⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.":
-            "⚠️ WARNING: This email shows typical phishing characteristics. Do not click links or provide personal information.",
-        "⚡ CAUTELA: Questa email presenta alcuni segnali sospetti. Verifica attentamente prima di intraprendere azioni.":
-            "⚡ CAUTION: This email has some suspicious signs. Verify carefully before taking action.",
-        "✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.":
-            "✅ This email appears legitimate, but always maintain a cautious attitude.",
-        "⛔ PERICOLO ELEVATO: Non cliccare sui link, non fornire informazioni personali. Elimina questa email.":
-            "⛔ HIGH DANGER: Do not click any links, do not provide personal information. Delete this email.",
-        // Additional variations without emojis
-        "PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.":
-            "DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
-        "Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.":
-            "Low risk, but always double-check the domain and prefer HTTPS whenever possible.",
-        "Questo URL è ad alto rischio":
-            "This URL is high risk",
-        "NON visitarlo":
-            "Do NOT visit it",
-        "Potrebbe rubare dati o installare malware":
-            "It may steal data or install malware",
-        "verifica sempre il dominio":
-            "always double-check the domain",
-        "usa HTTPS quando possibile":
-            "prefer HTTPS whenever possible"
-    };
-    
-    // Helper function to translate Italian messages to English
-    function translateMessage(message) {
-        if (!message) return message;
-        
-        // First try exact match
-        if (messageReplacements[message]) {
-            return messageReplacements[message];
-        }
-        
-        // If no exact match, try partial replacements for mixed content
-        let translatedMessage = message;
-        for (const [italian, english] of Object.entries(messageReplacements)) {
-            if (translatedMessage.includes(italian)) {
-                translatedMessage = translatedMessage.replace(italian, english);
-            }
-        }
-        
-        return translatedMessage;
-    }
     
     // Configure colors and icons based on risk level
     let colorClass = '';
@@ -259,21 +208,18 @@ function displayResults(data, mode = 'email') {
     
     switch(riskLevelNormalized) {
         case 'high':
-        case 'alto':
             colorClass = 'risk-high';
             iconClass = 'fa-exclamation-triangle';
             riskLevelText = 'HIGH RISK';
             recommendationText = riskMessages.high;
             break;
         case 'medium':
-        case 'medio':
             colorClass = 'risk-medium';
             iconClass = 'fa-exclamation-circle';
             riskLevelText = 'MEDIUM RISK';
             recommendationText = riskMessages.medium;
             break;
         case 'low':
-        case 'basso':
             colorClass = 'risk-low';
             iconClass = 'fa-check-circle';
             riskLevelText = 'LOW RISK';
@@ -294,9 +240,8 @@ function displayResults(data, mode = 'email') {
     riskBarFill.style.width = `${data.risk_score}%`;
     riskBarFill.className = `risk-bar-fill ${colorClass}`;
     
-    // Translate recommendation if it's in Italian
-    const backendRecommendation = data.recommendation || recommendationText;
-    recommendation.textContent = translateMessage(backendRecommendation);
+    // Use backend recommendation or fallback to English default
+    recommendation.textContent = data.recommendation || recommendationText;
     
     // Details/Findings - display as bulleted list
     const findingsContainer = document.getElementById('findingsContainer');
@@ -322,12 +267,10 @@ function displayResults(data, mode = 'email') {
             
             // Handle both string and object formats
             if (typeof detail === 'string') {
-                // Translate if Italian
-                li.textContent = translateMessage(detail);
+                li.textContent = detail;
             } else if (typeof detail === 'object' && detail !== null) {
                 // Try to extract meaningful content from object
-                const content = detail.message || detail.description || detail.text || JSON.stringify(detail);
-                li.textContent = translateMessage(content);
+                li.textContent = detail.message || detail.description || detail.text || JSON.stringify(detail);
             } else {
                 li.textContent = String(detail);
             }
