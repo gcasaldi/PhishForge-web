@@ -1,5 +1,5 @@
 // Configurazione API
-const API_BASE_URL = 'https://phishforge-lite.onrender.com/';
+const API_BASE_URL = 'https://phishforge-lite.onrender.com';
 
 // Esempi predefiniti
 const examples = {
@@ -59,12 +59,17 @@ async function analyzeEmail(sender, subject, body) {
         });
         
         if (!response.ok) {
-            throw new Error('Errore durante l\'analisi. Riprova più tardi.');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Errore durante l\'analisi. Riprova più tardi.');
         }
         
         return await response.json();
     } catch (error) {
         console.error('Error:', error);
+        // Gestione errori di rete
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error('Errore di connessione. Verifica la tua connessione internet e riprova.');
+        }
         throw error;
     }
 }
@@ -94,47 +99,91 @@ function displayResults(data) {
     const riskBarFill = document.getElementById('riskBarFill');
     const recommendation = document.getElementById('recommendation').querySelector('p');
     
+    // Mappa i livelli di rischio (gestisce vari formati)
+    const riskLevelNormalized = data.risk_level ? data.risk_level.toLowerCase() : 'low';
+    
     // Configura colori e icone in base al livello di rischio
     let colorClass = '';
     let iconClass = '';
+    let riskLevelText = '';
+    let recommendationText = '';
     
-    switch(data.risk_level) {
+    switch(riskLevelNormalized) {
         case 'high':
+        case 'alto':
             colorClass = 'risk-high';
             iconClass = 'fa-exclamation-triangle';
+            riskLevelText = 'ALTO RISCHIO';
+            recommendationText = '⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.';
             break;
         case 'medium':
+        case 'medio':
             colorClass = 'risk-medium';
             iconClass = 'fa-exclamation-circle';
+            riskLevelText = 'RISCHIO MEDIO';
+            recommendationText = '⚡ CAUTELA: Questa email presenta alcuni segnali sospetti. Verifica attentamente prima di intraprendere azioni.';
             break;
         case 'low':
+        case 'basso':
             colorClass = 'risk-low';
             iconClass = 'fa-check-circle';
+            riskLevelText = 'BASSO RISCHIO';
+            recommendationText = '✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.';
             break;
+        default:
+            colorClass = 'risk-low';
+            iconClass = 'fa-shield-alt';
+            riskLevelText = 'ANALISI COMPLETATA';
+            recommendationText = 'Analisi completata. Controlla i dettagli qui sotto.';
     }
     
     // Applica stili
     riskCard.className = `card risk-card ${colorClass}`;
     riskIcon.className = `fas ${iconClass}`;
-    riskLevel.textContent = data.risk_level.toUpperCase();
+    riskLevel.textContent = riskLevelText;
     riskScore.textContent = `${data.risk_score}/100`;
-    riskBarFill.style.width = `${data.risk_percentage}%`;
+    riskBarFill.style.width = `${data.risk_score}%`;
     riskBarFill.className = `risk-bar-fill ${colorClass}`;
-    recommendation.textContent = data.recommendation;
+    recommendation.textContent = data.recommendation || recommendationText;
     
-    // Findings
+    // Details/Findings - mostra come elenco puntato
     const findingsContainer = document.getElementById('findingsContainer');
     findingsContainer.innerHTML = '';
     
-    if (data.findings && data.findings.length > 0) {
+    // Gestisce sia 'details' (array di stringhe) che 'findings' (oggetti complessi)
+    const detailsList = data.details || [];
+    const findingsList = data.findings || [];
+    
+    if (detailsList.length > 0) {
+        const detailsCard = document.createElement('div');
+        detailsCard.className = 'card';
+        
+        const header = document.createElement('h3');
+        header.innerHTML = `<i class="fas fa-list"></i> Dettagli Analisi`;
+        detailsCard.appendChild(header);
+        
+        const ul = document.createElement('ul');
+        ul.className = 'details-list';
+        
+        detailsList.forEach(detail => {
+            const li = document.createElement('li');
+            li.textContent = detail;
+            ul.appendChild(li);
+        });
+        
+        detailsCard.appendChild(ul);
+        findingsContainer.appendChild(detailsCard);
+    }
+    
+    if (findingsList.length > 0) {
         const findingsCard = document.createElement('div');
         findingsCard.className = 'card';
         
         const header = document.createElement('h3');
-        header.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Problemi Rilevati (${data.findings.length})`;
+        header.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Problemi Rilevati (${findingsList.length})`;
         findingsCard.appendChild(header);
         
-        data.findings.forEach((finding, index) => {
+        findingsList.forEach((finding, index) => {
             const findingElement = createFindingElement(finding, index);
             findingsCard.appendChild(findingElement);
         });
