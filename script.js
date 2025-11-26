@@ -60,15 +60,15 @@ async function analyzeEmail(sender, subject, body) {
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Errore durante l\'analisi. Riprova più tardi.');
+            throw new Error(errorData.error || 'Analysis error. Please try again later.');
         }
         
         return await response.json();
     } catch (error) {
         console.error('Error:', error);
-        // Gestione errori di rete
+        // Network error handling
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error('Errore di connessione. Verifica la tua connessione internet e riprova.');
+            throw new Error('Connection error. Check your internet connection and try again.');
         }
         throw error;
     }
@@ -113,28 +113,28 @@ function displayResults(data) {
         case 'alto':
             colorClass = 'risk-high';
             iconClass = 'fa-exclamation-triangle';
-            riskLevelText = 'ALTO RISCHIO';
-            recommendationText = '⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.';
+            riskLevelText = 'HIGH RISK';
+            recommendationText = '⚠️ WARNING: This email shows typical phishing characteristics. Do not click links or provide personal information.';
             break;
         case 'medium':
         case 'medio':
             colorClass = 'risk-medium';
             iconClass = 'fa-exclamation-circle';
-            riskLevelText = 'RISCHIO MEDIO';
-            recommendationText = '⚡ CAUTELA: Questa email presenta alcuni segnali sospetti. Verifica attentamente prima di intraprendere azioni.';
+            riskLevelText = 'MEDIUM RISK';
+            recommendationText = '⚡ CAUTION: This email has some suspicious signs. Verify carefully before taking action.';
             break;
         case 'low':
         case 'basso':
             colorClass = 'risk-low';
             iconClass = 'fa-check-circle';
-            riskLevelText = 'BASSO RISCHIO';
-            recommendationText = '✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.';
+            riskLevelText = 'LOW RISK';
+            recommendationText = '✅ This email appears legitimate, but always maintain a cautious attitude.';
             break;
         default:
             colorClass = 'risk-low';
             iconClass = 'fa-shield-alt';
-            riskLevelText = 'ANALISI COMPLETATA';
-            recommendationText = 'Analisi completata. Controlla i dettagli qui sotto.';
+            riskLevelText = 'ANALYSIS COMPLETE';
+            recommendationText = 'Analysis complete. Check the details below.';
     }
     
     // Applica stili
@@ -159,7 +159,7 @@ function displayResults(data) {
         detailsCard.className = 'card';
         
         const header = document.createElement('h3');
-        header.innerHTML = `<i class="fas fa-list"></i> Dettagli Analisi`;
+        header.innerHTML = `<i class="fas fa-list"></i> Analysis Details`;
         detailsCard.appendChild(header);
         
         const ul = document.createElement('ul');
@@ -180,7 +180,7 @@ function displayResults(data) {
         findingsCard.className = 'card';
         
         const header = document.createElement('h3');
-        header.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Problemi Rilevati (${findingsList.length})`;
+        header.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Issues Detected (${findingsList.length})`;
         findingsCard.appendChild(header);
         
         findingsList.forEach((finding, index) => {
@@ -247,7 +247,7 @@ function createFindingElement(finding, index) {
             <strong>💡 ${escapeHtml(finding.educational.explanation)}</strong>
         </div>
         <div class="finding-tips">
-            <strong>📚 Consigli:</strong>
+            <strong>📚 Tips:</strong>
             <ul>
                 ${finding.educational.tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('')}
             </ul>
@@ -281,10 +281,10 @@ function showError(message) {
     results.innerHTML = `
         <div class="card error-card">
             <i class="fas fa-exclamation-circle"></i>
-            <h3>Errore</h3>
+            <h3>Error</h3>
             <p>${escapeHtml(message)}</p>
             <button class="btn btn-secondary" onclick="resetForm()">
-                <i class="fas fa-redo"></i> Riprova
+                <i class="fas fa-redo"></i> Try Again
             </button>
         </div>
     `;

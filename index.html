@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhishForge - Detector di Email Phishing</title>
+    <title>PhishForge - Phishing Email Detector</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -15,54 +15,54 @@
                 <i class="fas fa-shield-alt"></i>
                 <h1>PhishForge</h1>
             </div>
-            <p class="tagline">Analizzatore Intelligente di Email Phishing</p>
+            <p class="tagline">Intelligent Phishing Email Analyzer</p>
         </header>
 
-        <!-- Form di Analisi -->
+        <!-- Analysis Form -->
         <div class="card form-card">
-            <h2><i class="fas fa-envelope-open-text"></i> Analizza Email</h2>
+            <h2><i class="fas fa-envelope-open-text"></i> Analyze Email</h2>
             <form id="emailForm">
                 <div class="form-group">
                     <label for="sender">
-                        <i class="fas fa-user"></i> Mittente
+                        <i class="fas fa-user"></i> Sender
                     </label>
                     <input 
                         type="text" 
                         id="sender" 
                         name="sender" 
-                        placeholder="es: PayPal Security <noreply@paypal-verify.xyz>"
+                        placeholder="e.g., PayPal Security <noreply@paypal-verify.xyz>"
                         required
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="subject">
-                        <i class="fas fa-heading"></i> Oggetto
+                        <i class="fas fa-heading"></i> Subject
                     </label>
                     <input 
                         type="text" 
                         id="subject" 
                         name="subject" 
-                        placeholder="es: Urgent: Verify your account immediately!"
+                        placeholder="e.g., Urgent: Verify your account immediately!"
                         required
                     >
                 </div>
 
                 <div class="form-group">
                     <label for="body">
-                        <i class="fas fa-align-left"></i> Corpo Email
+                        <i class="fas fa-align-left"></i> Email Body
                     </label>
                     <textarea 
                         id="body" 
                         name="body" 
                         rows="8"
-                        placeholder="Incolla qui il testo dell'email da analizzare..."
+                        placeholder="Paste the email text to analyze here..."
                         required
                     ></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="analyzeBtn">
-                    <i class="fas fa-search"></i> Analizza Email
+                    <i class="fas fa-search"></i> Analyze Email
                 </button>
             </form>
         </div>
@@ -70,7 +70,7 @@
         <!-- Loading -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
-            <p>Analisi in corso...</p>
+            <p>Analysis in progress...</p>
         </div>
 
         <!-- Risultati -->
@@ -82,7 +82,7 @@
                         <i id="riskIcon" class="fas fa-shield-alt"></i>
                     </div>
                     <div class="risk-info">
-                        <h2 id="riskLevel">RISCHIO</h2>
+                        <h2 id="riskLevel">RISK</h2>
                         <p id="riskScore">0/100</p>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
             <!-- URLs Detected -->
             <div id="urlsContainer" class="urls-container hidden">
                 <div class="card">
-                    <h3><i class="fas fa-link"></i> URL Rilevati</h3>
+                    <h3><i class="fas fa-link"></i> Detected URLs</h3>
                     <div id="urlsList" class="urls-list"></div>
                 </div>
             </div>
@@ -111,22 +111,22 @@
             <!-- Actions -->
             <div class="actions">
                 <button class="btn btn-secondary" onclick="resetForm()">
-                    <i class="fas fa-redo"></i> Nuova Analisi
+                    <i class="fas fa-redo"></i> New Analysis
                 </button>
             </div>
         </div>
 
         <!-- Examples -->
         <div class="card examples-card">
-            <h3><i class="fas fa-lightbulb"></i> Esempi da Provare</h3>
+            <h3><i class="fas fa-lightbulb"></i> Try Examples</h3>
             <div class="examples-grid">
                 <button class="example-btn" onclick="loadExample('phishing')">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Email Phishing
+                    Phishing Email
                 </button>
                 <button class="example-btn" onclick="loadExample('legitimate')">
                     <i class="fas fa-check-circle"></i>
-                    Email Legittima
+                    Legitimate Email
                 </button>
             </div>
         </div>
@@ -135,11 +135,11 @@
         <footer class="footer">
             <p>
                 <i class="fas fa-shield-alt"></i> 
-                PhishForge - Protezione Intelligente dalle Email di Phishing
+                PhishForge - Intelligent Protection from Phishing Emails
             </p>
             <p class="footer-note">
                 <i class="fas fa-info-circle"></i>
-                Questo strumento è educativo. Verifica sempre con il mittente ufficiale.
+                This tool is educational. Always verify with the official sender.
             </p>
         </footer>
     </div>
