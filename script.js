@@ -193,6 +193,13 @@ function displayResults(data, mode = 'email') {
     // Map risk levels (handles various formats)
     const riskLevelNormalized = data.risk_level ? data.risk_level.toLowerCase() : 'low';
     
+    // Risk messages mapping
+    const riskMessages = {
+        low: "Low risk. No clear phishing indicators were detected, but stay cautious and verify the sender if something feels unusual.",
+        medium: "Medium risk. Some suspicious patterns were found. Double-check the sender and links before clicking or sharing any information.",
+        high: "High risk. This message matches common phishing patterns. Do not click any links or share credentials. Treat it as a likely phishing attempt."
+    };
+    
     // Configure colors and icons based on risk level
     let colorClass = '';
     let iconClass = '';
@@ -205,21 +212,21 @@ function displayResults(data, mode = 'email') {
             colorClass = 'risk-high';
             iconClass = 'fa-exclamation-triangle';
             riskLevelText = 'HIGH RISK';
-            recommendationText = '⚠️ WARNING: This email shows typical phishing characteristics. Do not click links or provide personal information.';
+            recommendationText = riskMessages.high;
             break;
         case 'medium':
         case 'medio':
             colorClass = 'risk-medium';
             iconClass = 'fa-exclamation-circle';
             riskLevelText = 'MEDIUM RISK';
-            recommendationText = '⚡ CAUTION: This email has some suspicious signs. Verify carefully before taking action.';
+            recommendationText = riskMessages.medium;
             break;
         case 'low':
         case 'basso':
             colorClass = 'risk-low';
             iconClass = 'fa-check-circle';
             riskLevelText = 'LOW RISK';
-            recommendationText = '✅ This email appears legitimate, but always maintain a cautious attitude.';
+            recommendationText = riskMessages.low;
             break;
         default:
             colorClass = 'risk-low';
@@ -241,8 +248,8 @@ function displayResults(data, mode = 'email') {
     const findingsContainer = document.getElementById('findingsContainer');
     findingsContainer.innerHTML = '';
     
-    // Handles both 'details' (string array) and 'findings' (complex objects) and 'indicators'
-    const detailsList = data.details || data.indicators || [];
+    // Handles 'details', 'analysisDetails', 'indicators' (can be strings or objects), and 'findings'
+    const detailsList = data.analysisDetails || data.details || data.indicators || [];
     const findingsList = data.findings || [];
     
     if (detailsList.length > 0) {
@@ -256,9 +263,19 @@ function displayResults(data, mode = 'email') {
         const ul = document.createElement('ul');
         ul.className = 'details-list';
         
-        detailsList.forEach(detail => {
+        detailsList.forEach((detail, idx) => {
             const li = document.createElement('li');
-            li.textContent = detail;
+            
+            // Handle both string and object formats
+            if (typeof detail === 'string') {
+                li.textContent = detail;
+            } else if (typeof detail === 'object' && detail !== null) {
+                // Try to extract meaningful content from object
+                li.textContent = detail.message || detail.description || detail.text || JSON.stringify(detail);
+            } else {
+                li.textContent = String(detail);
+            }
+            
             ul.appendChild(li);
         });
         
