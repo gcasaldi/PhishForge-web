@@ -206,6 +206,8 @@ function displayResults(data, mode = 'email') {
             "🚨 DANGER: This email is high risk. Do NOT click any links or share personal information. Delete this message.",
         "✅ Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.": 
             "✅ Low risk, but always double-check the sender and the domain before trusting any links.",
+        "✅ Rischio basso, ma rimani vigile. Verifica sempre l'identità del mittente per richieste inusuali.":
+            "✅ Low risk, but stay vigilant. Always verify the sender's identity for unusual requests.",
         "🚨 PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.":
             "🚨 DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
         "⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.":
