@@ -1,7 +1,7 @@
-// Configurazione API
+// API Configuration
 const API_BASE_URL = 'https://phishforge-lite.onrender.com';
 
-// Esempi predefiniti
+// Predefined examples
 const examples = {
     phishing: {
         sender: 'PayPal Security <noreply@paypal-verify.xyz>',
@@ -15,7 +15,7 @@ const examples = {
     }
 };
 
-// Elementi DOM
+// DOM Elements
 const form = document.getElementById('emailForm');
 const loading = document.getElementById('loading');
 const results = document.getElementById('results');
@@ -24,7 +24,7 @@ const analyzeBtn = document.getElementById('analyzeBtn');
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
 
-// Gestione submit del form
+// Form submit handler
 async function handleSubmit(e) {
     e.preventDefault();
     
@@ -32,7 +32,7 @@ async function handleSubmit(e) {
     const subject = document.getElementById('subject').value;
     const body = document.getElementById('body').value;
     
-    // Mostra loading
+    // Show loading
     showLoading();
     
     try {
@@ -43,7 +43,7 @@ async function handleSubmit(e) {
     }
 }
 
-// Chiamata API
+// API call
 async function analyzeEmail(sender, subject, body) {
     try {
         const response = await fetch(`${API_BASE_URL}/analyze`, {
@@ -74,20 +74,20 @@ async function analyzeEmail(sender, subject, body) {
     }
 }
 
-// Mostra loading
+// Show loading
 function showLoading() {
     results.classList.add('hidden');
     loading.classList.remove('hidden');
     analyzeBtn.disabled = true;
 }
 
-// Nascondi loading
+// Hide loading
 function hideLoading() {
     loading.classList.add('hidden');
     analyzeBtn.disabled = false;
 }
 
-// Mostra risultati
+// Display results
 function displayResults(data) {
     hideLoading();
     
@@ -99,10 +99,10 @@ function displayResults(data) {
     const riskBarFill = document.getElementById('riskBarFill');
     const recommendation = document.getElementById('recommendation').querySelector('p');
     
-    // Mappa i livelli di rischio (gestisce vari formati)
+    // Map risk levels (handles various formats)
     const riskLevelNormalized = data.risk_level ? data.risk_level.toLowerCase() : 'low';
     
-    // Configura colori e icone in base al livello di rischio
+    // Configure colors and icons based on risk level
     let colorClass = '';
     let iconClass = '';
     let riskLevelText = '';
@@ -137,7 +137,7 @@ function displayResults(data) {
             recommendationText = 'Analysis complete. Check the details below.';
     }
     
-    // Applica stili
+    // Apply styles
     riskCard.className = `card risk-card ${colorClass}`;
     riskIcon.className = `fas ${iconClass}`;
     riskLevel.textContent = riskLevelText;
@@ -146,11 +146,11 @@ function displayResults(data) {
     riskBarFill.className = `risk-bar-fill ${colorClass}`;
     recommendation.textContent = data.recommendation || recommendationText;
     
-    // Details/Findings - mostra come elenco puntato
+    // Details/Findings - display as bulleted list
     const findingsContainer = document.getElementById('findingsContainer');
     findingsContainer.innerHTML = '';
     
-    // Gestisce sia 'details' (array di stringhe) che 'findings' (oggetti complessi)
+    // Handles both 'details' (string array) and 'findings' (complex objects)
     const detailsList = data.details || [];
     const findingsList = data.findings || [];
     
@@ -212,14 +212,14 @@ function displayResults(data) {
         urlsContainer.classList.add('hidden');
     }
     
-    // Mostra risultati
+    // Show results
     results.classList.remove('hidden');
     
-    // Scroll ai risultati
+    // Scroll to results
     results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Crea elemento per un finding
+// Create element for a finding
 function createFindingElement(finding, index) {
     const findingDiv = document.createElement('div');
     findingDiv.className = 'finding-item';
@@ -260,7 +260,7 @@ function createFindingElement(finding, index) {
     return findingDiv;
 }
 
-// Toggle finding espansione
+// Toggle finding expansion
 function toggleFinding(index) {
     const content = document.getElementById(`content-${index}`);
     const toggle = document.getElementById(`toggle-${index}`);
@@ -274,7 +274,7 @@ function toggleFinding(index) {
     }
 }
 
-// Mostra errore
+// Show error
 function showError(message) {
     hideLoading();
     
@@ -292,7 +292,7 @@ function showError(message) {
     results.classList.remove('hidden');
 }
 
-// Carica esempio
+// Load example
 function loadExample(type) {
     const example = examples[type];
     
@@ -300,7 +300,7 @@ function loadExample(type) {
     document.getElementById('subject').value = example.subject;
     document.getElementById('body').value = example.body;
     
-    // Scroll al form
+    // Scroll to form
     form.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -311,7 +311,7 @@ function resetForm() {
     form.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Escape HTML per sicurezza
+// Escape HTML for security
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -323,7 +323,7 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Check API health al caricamento (opzionale)
+// Check API health on load (optional)
 async function checkApiHealth() {
     try {
         const response = await fetch(`${API_BASE_URL}/health`);
@@ -335,5 +335,5 @@ async function checkApiHealth() {
     }
 }
 
-// Esegui health check
+// Execute health check
 checkApiHealth();
