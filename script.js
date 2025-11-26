@@ -213,13 +213,42 @@ function displayResults(data, mode = 'email') {
         "✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.":
             "✅ This email appears legitimate, but always maintain a cautious attitude.",
         "⛔ PERICOLO ELEVATO: Non cliccare sui link, non fornire informazioni personali. Elimina questa email.":
-            "⛔ HIGH DANGER: Do not click any links, do not provide personal information. Delete this email."
+            "⛔ HIGH DANGER: Do not click any links, do not provide personal information. Delete this email.",
+        // Additional variations without emojis
+        "PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.":
+            "DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
+        "Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.":
+            "Low risk, but always double-check the domain and prefer HTTPS whenever possible.",
+        "Questo URL è ad alto rischio":
+            "This URL is high risk",
+        "NON visitarlo":
+            "Do NOT visit it",
+        "Potrebbe rubare dati o installare malware":
+            "It may steal data or install malware",
+        "verifica sempre il dominio":
+            "always double-check the domain",
+        "usa HTTPS quando possibile":
+            "prefer HTTPS whenever possible"
     };
     
     // Helper function to translate Italian messages to English
     function translateMessage(message) {
         if (!message) return message;
-        return messageReplacements[message] || message;
+        
+        // First try exact match
+        if (messageReplacements[message]) {
+            return messageReplacements[message];
+        }
+        
+        // If no exact match, try partial replacements for mixed content
+        let translatedMessage = message;
+        for (const [italian, english] of Object.entries(messageReplacements)) {
+            if (translatedMessage.includes(italian)) {
+                translatedMessage = translatedMessage.replace(italian, english);
+            }
+        }
+        
+        return translatedMessage;
     }
     
     // Configure colors and icons based on risk level
