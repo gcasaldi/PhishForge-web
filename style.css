@@ -129,6 +129,55 @@ body {
     gap: 10px;
 }
 
+/* Mode Tabs */
+.mode-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+    background: var(--bg-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-btn i {
+    font-size: 18px;
+}
+
+/* Analysis Modes */
+.analysis-mode {
+    display: none;
+}
+
+.analysis-mode.active {
+    display: block;
+}
+
 /* Form */
 .form-group {
     margin-bottom: 20px;
@@ -272,6 +321,18 @@ body {
     to {
         transform: rotate(360deg);
     }
+}
+
+.mode-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--bg-color);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border: 2px solid var(--border-color);
 }
 
 .risk-header {

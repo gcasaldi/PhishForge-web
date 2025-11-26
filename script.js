@@ -12,17 +12,51 @@ const examples = {
         sender: 'Company Newsletter <newsletter@company.com>',
         subject: 'Monthly Newsletter - November 2025',
         body: 'Hello valued customer,\n\nHere is our monthly newsletter with updates and news about our services.\n\nVisit our website for more information: https://www.company.com\n\nBest regards,\nThe Team'
-    }
+    },
+    phishingUrl: 'http://paypal-verify.xyz/account/login',
+    legitimateUrl: 'https://www.paypal.com'
 };
 
 // DOM Elements
 const form = document.getElementById('emailForm');
+const urlForm = document.getElementById('urlForm');
 const loading = document.getElementById('loading');
 const results = document.getElementById('results');
 const analyzeBtn = document.getElementById('analyzeBtn');
+const analyzeUrlBtn = document.getElementById('analyzeUrlBtn');
+
+// Current mode
+let currentMode = 'email';
 
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
+urlForm.addEventListener('submit', handleUrlSubmit);
+
+// Switch mode function
+function switchMode(mode) {
+    currentMode = mode;
+    
+    // Update tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.mode === mode) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Update forms
+    document.querySelectorAll('.analysis-mode').forEach(modeDiv => {
+        if (modeDiv.id === mode + 'Mode') {
+            modeDiv.classList.add('active');
+        } else {
+            modeDiv.classList.remove('active');
+        }
+    });
+    
+    // Hide results when switching modes
+    results.classList.add('hidden');
+}
 
 // Form submit handler
 async function handleSubmit(e) {
@@ -37,7 +71,24 @@ async function handleSubmit(e) {
     
     try {
         const result = await analyzeEmail(sender, subject, body);
-        displayResults(result);
+        displayResults(result, 'email');
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+// URL form submit handler
+async function handleUrlSubmit(e) {
+    e.preventDefault();
+    
+    const url = document.getElementById('url').value;
+    
+    // Show loading
+    showLoading();
+    
+    try {
+        const result = await analyzeUrl(url);
+        displayResults(result, 'url');
     } catch (error) {
         showError(error.message);
     }
@@ -74,22 +125,62 @@ async function analyzeEmail(sender, subject, body) {
     }
 }
 
+// URL analysis API call
+async function analyzeUrl(url) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/analyze-url`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                url: url
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Analysis error. Please try again later.');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        // Network error handling
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error('Connection error. Check your internet connection and try again.');
+        }
+        throw error;
+    }
+}
+
 // Show loading
 function showLoading() {
     results.classList.add('hidden');
     loading.classList.remove('hidden');
     analyzeBtn.disabled = true;
+    analyzeUrlBtn.disabled = true;
 }
 
 // Hide loading
 function hideLoading() {
     loading.classList.add('hidden');
     analyzeBtn.disabled = false;
+    analyzeUrlBtn.disabled = false;
 }
 
 // Display results
-function displayResults(data) {
+function displayResults(data, mode = 'email') {
     hideLoading();
+    
+    // Show mode badge
+    const modeBadge = document.getElementById('modeBadge');
+    if (mode === 'url') {
+        modeBadge.textContent = 'Mode: URL only';
+        modeBadge.style.display = 'inline-block';
+    } else {
+        modeBadge.style.display = 'none';
+    }
     
     // Risk Card
     const riskCard = document.getElementById('riskCard');
@@ -150,8 +241,8 @@ function displayResults(data) {
     const findingsContainer = document.getElementById('findingsContainer');
     findingsContainer.innerHTML = '';
     
-    // Handles both 'details' (string array) and 'findings' (complex objects)
-    const detailsList = data.details || [];
+    // Handles both 'details' (string array) and 'findings' (complex objects) and 'indicators'
+    const detailsList = data.details || data.indicators || [];
     const findingsList = data.findings || [];
     
     if (detailsList.length > 0) {
@@ -294,21 +385,29 @@ function showError(message) {
 
 // Load example
 function loadExample(type) {
-    const example = examples[type];
-    
-    document.getElementById('sender').value = example.sender;
-    document.getElementById('subject').value = example.subject;
-    document.getElementById('body').value = example.body;
-    
-    // Scroll to form
-    form.scrollIntoView({ behavior: 'smooth' });
+    if (type === 'phishing' || type === 'legitimate') {
+        // Email example
+        switchMode('email');
+        const example = examples[type];
+        document.getElementById('sender').value = example.sender;
+        document.getElementById('subject').value = example.subject;
+        document.getElementById('body').value = example.body;
+        form.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // Reset form
 function resetForm() {
     form.reset();
+    urlForm.reset();
     results.classList.add('hidden');
-    form.scrollIntoView({ behavior: 'smooth' });
+    
+    // Scroll to appropriate form based on current mode
+    if (currentMode === 'url') {
+        urlForm.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        form.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // Escape HTML for security

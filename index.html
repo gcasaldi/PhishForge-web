@@ -20,51 +20,85 @@
 
         <!-- Analysis Form -->
         <div class="card form-card">
-            <h2><i class="fas fa-envelope-open-text"></i> Analyze Email</h2>
-            <form id="emailForm">
-                <div class="form-group">
-                    <label for="sender">
-                        <i class="fas fa-user"></i> Sender
-                    </label>
-                    <input 
-                        type="text" 
-                        id="sender" 
-                        name="sender" 
-                        placeholder="e.g., PayPal Security <noreply@paypal-verify.xyz>"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="subject">
-                        <i class="fas fa-heading"></i> Subject
-                    </label>
-                    <input 
-                        type="text" 
-                        id="subject" 
-                        name="subject" 
-                        placeholder="e.g., Urgent: Verify your account immediately!"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="body">
-                        <i class="fas fa-align-left"></i> Email Body
-                    </label>
-                    <textarea 
-                        id="body" 
-                        name="body" 
-                        rows="8"
-                        placeholder="Paste the email text to analyze here..."
-                        required
-                    ></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="analyzeBtn">
-                    <i class="fas fa-search"></i> Analyze Email
+            <!-- Mode Tabs -->
+            <div class="mode-tabs">
+                <button class="tab-btn active" data-mode="email" onclick="switchMode('email')">
+                    <i class="fas fa-envelope"></i> Email Analysis
                 </button>
-            </form>
+                <button class="tab-btn" data-mode="url" onclick="switchMode('url')">
+                    <i class="fas fa-link"></i> URL Analysis
+                </button>
+            </div>
+
+            <!-- Email Analysis Form -->
+            <div id="emailMode" class="analysis-mode active">
+                <form id="emailForm">
+                    <div class="form-group">
+                        <label for="sender">
+                            <i class="fas fa-user"></i> Sender
+                        </label>
+                        <input 
+                            type="text" 
+                            id="sender" 
+                            name="sender" 
+                            placeholder="e.g., PayPal Security <noreply@paypal-verify.xyz>"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">
+                            <i class="fas fa-heading"></i> Subject
+                        </label>
+                        <input 
+                            type="text" 
+                            id="subject" 
+                            name="subject" 
+                            placeholder="e.g., Urgent: Verify your account immediately!"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="body">
+                            <i class="fas fa-align-left"></i> Email Body
+                        </label>
+                        <textarea 
+                            id="body" 
+                            name="body" 
+                            rows="8"
+                            placeholder="Paste the email text to analyze here..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                        <i class="fas fa-search"></i> Analyze Email
+                    </button>
+                </form>
+            </div>
+
+            <!-- URL Analysis Form -->
+            <div id="urlMode" class="analysis-mode">
+                <form id="urlForm">
+                    <div class="form-group">
+                        <label for="url">
+                            <i class="fas fa-link"></i> URL
+                        </label>
+                        <textarea 
+                            id="url" 
+                            name="url" 
+                            rows="4"
+                            placeholder="Paste URL to analyze..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="analyzeUrlBtn">
+                        <i class="fas fa-search"></i> Analyze URL
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- Loading -->
@@ -77,6 +111,7 @@
         <div id="results" class="results hidden">
             <!-- Risk Summary -->
             <div class="card risk-card" id="riskCard">
+                <div class="mode-badge" id="modeBadge" style="display: none;"></div>
                 <div class="risk-header">
                     <div class="risk-icon">
                         <i id="riskIcon" class="fas fa-shield-alt"></i>
