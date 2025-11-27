@@ -1,96 +1,74 @@
-# PhishForge Frontend - Web App Pubblica
+# 🛡️ PhishForge Lite — AI-Powered Phishing Detection
 
-Interfaccia web per l'analizzatore di email phishing PhishForge.
+PhishForge Lite is a lightweight phishing detection engine that analyzes URLs and emails using a multi-layer approach combining heuristics, threat-intelligence rules, and a versioned Machine Learning model.
 
-## 🌐 Demo Live
+Its goal is simple: **provide fast, explainable, and reliable phishing detection for real-world scenarios**.
 
-Questa web app sarà pubblicata su GitHub Pages e comunica con l'API backend privata su Render.
+---
 
-## 📁 Struttura
+## ⚙️ Architecture Overview
 
-```
-frontend/
-├── index.html    # Interfaccia principale
-├── script.js     # Logica JavaScript
-└── style.css     # Stili CSS
-```
+### **Frontend**
+- Hosted on GitHub Pages  
+- Clean and simple UI for URL/email analysis  
+- Direct communication with backend via Fetch API  
 
-## 🚀 Come Usare
+### **Backend**
+- FastAPI running on Render  
+- `/analyze` endpoint returning a combined phishing risk score  
+- ML model loaded once at startup (cached in memory)
 
-### 1. Configurazione API
+### **Machine Learning Engine**
+- Model: `url_phishing_model.joblib`  
+- Pipeline: `TfidfVectorizer` + `LogisticRegression`  
+- Fully versioned  
+- Deterministic loading  
+- Designed for safe, controlled updates
 
-In `script.js`, aggiorna l'URL dell'API dopo il deploy su Render:
+The model does **not** retrain itself.  
+It is intentionally static to ensure security, consistency, and explainability.
 
-```javascript
-const API_BASE
-```
+---
 
-### 2. Test Locale
+## 🚀 Key Features
 
-Apri semplicemente `index.html` in un browser.
+- Real-time URL analysis  
+- Email analysis (subject, sender, body)  
+- Combined scoring (0–100)  
+- Deterministic ML inference  
+- Auto-deployment on Render after each push  
+- Zero secrets in the frontend (safe)
 
-### 3. Deploy su GitHub Pages
+---
 
-#### Metodo 1: Interfaccia GitHub
-1. Vai su **Settings** del repository
-2. Sezione **Pages**
-3. Source: **Deploy from a branch**
-4. Branch: **main** → cartella: **/frontend**
-5. Salva
+## 📈 Example Scores
 
-#### Metodo 2: GitHub Actions
-GitHub rileverà automaticamente i file HTML e li pubblicherà.
+| Input | Score | Classification |
+|-------|-------|----------------|
+| `paypal-verify-account.xyz` | 66/100 | Phishing |
+| `bit.ly/free-money` | 66/100 | Phishing |
+| `www.google.com` | 27/100 | Legitimate |
+| Suspicious email | 70–95/100 | Phishing |
 
-## ✨ Funzionalità
+---
 
-- ✅ Interfaccia moderna e responsive
-- ✅ Analisi in tempo reale delle email
-- ✅ Visualizzazione dettagliata dei rischi
-- ✅ Spiegazioni educative per ogni problema
-- ✅ Esempi predefiniti da testare
-- ✅ Design mobile-friendly
+## 🤖 ML Versioning & Update Process
 
-## 🎨 Design
+The ML model is **versioned and static in production**.  
+It does **not** train itself on live traffic and does **not** store or learn from user inputs.
 
-- Gradiente moderno viola/blu
-- Card con shadow ed effetti
-- Icone Font Awesome
-- Animazioni fluide
-- Completamente responsive
+This is intentional to avoid:
+- data poisoning,
+- unstable behaviour,
+- and inconsistent scoring.
 
-## 🔒 Sicurezza
+### Update Workflow
 
-- Il codice Python rimane privato nel repository backend
-- Solo l'interfaccia HTML/CSS/JS è pubblica
-- Comunicazione sicura con l'API via HTTPS (dopo deploy)
+When you want to improve the model, the update is explicit and controlled:
 
-## 📱 Compatibilità
+1. **Update or extend the training data**  
+   - e.g. add new phishing/legit URLs under `ml/data/`
 
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers
-
-## 🛠️ Personalizzazione
-
-### Colori
-Modifica le variabili CSS in `style.css`:
-
-```css
-:root {
-    --primary-color: #2563eb;
-    --danger-color: #dc2626;
-    --warning-color: #f59e0b;
-    --success-color: #10b981;
-}
-```
-
-### Testi
-Modifica i contenuti in `index.html`.
-
-### Logica
-Modifica le funzioni in `script.js`.
-
-## 📄 Licenza
-
-MIT License
+2. **Train a new model locally**
+   ```bash
+   python ml/train_url_model.py
