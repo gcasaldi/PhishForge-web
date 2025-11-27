@@ -22,7 +22,7 @@ frontend/
 In `script.js`, aggiorna l'URL dell'API dopo il deploy su Render:
 
 ```javascript
-const API_BASE_URL = 'https://phishforge-lite.onrender.com/';
+const API_BASE
 ```
 
 ### 2. Test Locale
