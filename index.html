@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<header>
-  <img src="img/phishforge-logo.png" alt="PhishForge Logo" style="width:150px;">
-</header>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Logo in alto a sinistra -->
+    <div class="top-logo">
+        <img src="img/phishforge-logo.png" alt="PhishForge Logo">
+    </div>
+
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <i class="fas fa-shield-alt"></i>
-                <h1>PhishForge</h1>
-            </div>
-            <p class="tagline">Intelligent Phishing Email Analyzer</p>
-        </header>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title">PhishForge</h1>
+            <p class="hero-subtitle">Intelligent Phishing Email Analyzer</p>
+        </section>
 
         <!-- Analysis Form -->
         <div class="card form-card">
@@ -75,8 +74,8 @@
                         ></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="analyzeBtn">
-                        <i class="fas fa-search"></i> Analyze Email
+                    <button type="submit" class="btn btn-primary btn-cta" id="analyzeBtn">
+                        <i class="fas fa-search"></i> Analyze Now
                     </button>
                 </form>
             </div>
@@ -97,8 +96,8 @@
                         ></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="analyzeUrlBtn">
-                        <i class="fas fa-search"></i> Analyze URL
+                    <button type="submit" class="btn btn-primary btn-cta" id="analyzeUrlBtn">
+                        <i class="fas fa-search"></i> Analyze Now
                     </button>
                 </form>
             </div>
@@ -171,14 +170,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>
-                <i class="fas fa-shield-alt"></i> 
-                PhishForge - Intelligent Protection from Phishing Emails
-            </p>
-            <p class="footer-note">
-                <i class="fas fa-info-circle"></i>
-                This tool is educational. Always verify with the official sender.
-            </p>
+            <p>© 2025 – PhishForge</p>
         </footer>
     </div>
 
