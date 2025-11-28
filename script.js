@@ -255,6 +255,61 @@ function hideLoading() {
     analyzeUrlBtn.disabled = false;
 }
 
+// Global translation map for Italian to English
+const italianToEnglishMap = {
+    "🚨 PERICOLO ELEVATO: Non cliccare sui link, non fornire informazioni personali. Elimina questa email.": 
+        "🚨 DANGER: This email is high risk. Do NOT click any links or share personal information. Delete this message.",
+    "✅ Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.": 
+        "✅ Low risk, but always double-check the sender and the domain before trusting any links.",
+    "✅ Rischio basso, ma rimani vigile. Verifica sempre l'identità del mittente per richieste inusuali.":
+        "✅ Low risk, but stay vigilant. Always verify the sender's identity for unusual requests.",
+    "🚨 PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.":
+        "🚨 DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
+    "⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.":
+        "⚠️ WARNING: This email shows typical phishing characteristics. Do not click links or provide personal information.",
+    "⚡ CAUTELA: Questa email presenta alcuni segnali sospetti. Verifica attentamente prima di intraprendere azioni.":
+        "⚡ CAUTION: This email has some suspicious signs. Verify carefully before taking action.",
+    "✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.":
+        "✅ This email appears legitimate, but always maintain a cautious attitude.",
+    // Additional Italian phrases
+    "Mittente sospetto": "Suspicious sender",
+    "URL sospetto": "Suspicious URL",
+    "Dominio non sicuro": "Unsafe domain",
+    "Linguaggio urgente": "Urgent language",
+    "Richiesta di informazioni personali": "Request for personal information",
+    "Link mascherato": "Masked link",
+    "Errori grammaticali": "Grammar errors",
+    "Allegato sospetto": "Suspicious attachment",
+    "Phishing": "Phishing",
+    "Legittimo": "Legitimate",
+    "Sospetto": "Suspicious",
+    "Alto rischio": "High risk",
+    "Medio rischio": "Medium risk",
+    "Basso rischio": "Low risk",
+    "Errore": "Error",
+    "Analisi fallita": "Analysis failed",
+    "Connessione fallita": "Connection failed"
+};
+
+// Global function to translate Italian text to English
+function translateToEnglish(text) {
+    if (!text || typeof text !== 'string') return text;
+    
+    // Try exact match first
+    if (italianToEnglishMap[text]) {
+        return italianToEnglishMap[text];
+    }
+    
+    // Try partial matches
+    for (const [italian, english] of Object.entries(italianToEnglishMap)) {
+        if (text.includes(italian)) {
+            text = text.replace(italian, english);
+        }
+    }
+    
+    return text;
+}
+
 // Display results
 function displayResults(data, mode = 'email') {
     hideLoading();
@@ -285,43 +340,6 @@ function displayResults(data, mode = 'email') {
         medium: "Medium risk. Some suspicious patterns were found. Double-check the sender and links before clicking or sharing any information.",
         high: "High risk. This message matches common phishing patterns. Do not click any links or share credentials. Treat it as a likely phishing attempt."
     };
-    
-    // Translation map for backend Italian messages
-    const italianToEnglish = {
-        "🚨 PERICOLO ELEVATO: Non cliccare sui link, non fornire informazioni personali. Elimina questa email.": 
-            "🚨 DANGER: This email is high risk. Do NOT click any links or share personal information. Delete this message.",
-        "✅ Rischio basso, ma verifica sempre il dominio e usa HTTPS quando possibile.": 
-            "✅ Low risk, but always double-check the sender and the domain before trusting any links.",
-        "✅ Rischio basso, ma rimani vigile. Verifica sempre l'identità del mittente per richieste inusuali.":
-            "✅ Low risk, but stay vigilant. Always verify the sender's identity for unusual requests.",
-        "🚨 PERICOLO: Questo URL è ad alto rischio. NON visitarlo. Potrebbe rubare dati o installare malware.":
-            "🚨 DANGER: This URL is high risk. Do NOT visit it. It may steal data, impersonate trusted services, or install malware.",
-        "⚠️ ATTENZIONE: Questa email presenta caratteristiche tipiche di phishing. Non cliccare sui link e non fornire informazioni personali.":
-            "⚠️ WARNING: This email shows typical phishing characteristics. Do not click links or provide personal information.",
-        "⚡ CAUTELA: Questa email presenta alcuni segnali sospetti. Verifica attentamente prima di intraprendere azioni.":
-            "⚡ CAUTION: This email has some suspicious signs. Verify carefully before taking action.",
-        "✅ Questa email sembra legittima, ma mantieni sempre un atteggiamento prudente.":
-            "✅ This email appears legitimate, but always maintain a cautious attitude."
-    };
-    
-    // Helper function to translate Italian text to English
-    function translateToEnglish(text) {
-        if (!text || typeof text !== 'string') return text;
-        
-        // Try exact match first
-        if (italianToEnglish[text]) {
-            return italianToEnglish[text];
-        }
-        
-        // Try partial matches
-        for (const [italian, english] of Object.entries(italianToEnglish)) {
-            if (text.includes(italian)) {
-                text = text.replace(italian, english);
-            }
-        }
-        
-        return text;
-    }
     
     // Configure colors and icons based on risk level
     let colorClass = '';
@@ -582,7 +600,11 @@ function displayExplainability(data) {
     const confidenceScore = document.getElementById('confidenceScore');
     const riskFactorsList = document.getElementById('riskFactorsList');
     
-    if (!explainabilityContainer) return;
+    // Safety checks - return if elements don't exist
+    if (!explainabilityContainer || !threatLabel || !confidenceScore || !riskFactorsList) {
+        console.warn('Explainability elements not found in DOM');
+        return;
+    }
     
     // Show explainability section
     explainabilityContainer.style.display = 'block';
@@ -718,11 +740,14 @@ function toggleFinding(index) {
 function showError(message) {
     hideLoading();
     
+    // Translate error message if it's in Italian
+    const translatedMessage = translateToEnglish(message) || message;
+    
     results.innerHTML = `
         <div class="card error-card">
             <i class="fas fa-exclamation-circle"></i>
             <h3>Error</h3>
-            <p>${escapeHtml(message)}</p>
+            <p>${escapeHtml(translatedMessage)}</p>
             <button class="btn btn-secondary" onclick="resetForm()">
                 <i class="fas fa-redo"></i> Try Again
             </button>
