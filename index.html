@@ -141,6 +141,27 @@
                 <!-- Findings will be inserted here -->
             </div>
 
+            <!-- Attachment Analysis -->
+            <div id="attachmentContainer" class="attachment-container hidden">
+                <div class="card">
+                    <h3><i class="fas fa-paperclip"></i> Attachment Analysis</h3>
+                    <div class="attachment-score">
+                        <span class="label">Risk Score:</span>
+                        <span id="attachmentScore" class="score">0</span>
+                    </div>
+                    <div id="attachmentWarning" class="attachment-warning hidden">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>High-risk attachment format detected. Do NOT open this file.</strong>
+                    </div>
+                    <div class="attachment-details">
+                        <h4>Detection Flags:</h4>
+                        <ul id="attachmentFlags" class="attachment-flags">
+                            <!-- Flags will be inserted here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- URLs Detected -->
             <div id="urlsContainer" class="urls-container hidden">
                 <div class="card">

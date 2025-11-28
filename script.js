@@ -358,6 +358,52 @@ function displayResults(data, mode = 'email') {
         urlsContainer.classList.add('hidden');
     }
     
+    // Attachment Analysis
+    const attachmentContainer = document.getElementById('attachmentContainer');
+    const attachmentScore = document.getElementById('attachmentScore');
+    const attachmentWarning = document.getElementById('attachmentWarning');
+    const attachmentFlags = document.getElementById('attachmentFlags');
+    
+    if (data.attachment_score !== undefined && data.attachment_details) {
+        attachmentContainer.classList.remove('hidden');
+        attachmentScore.textContent = data.attachment_score;
+        
+        // Show warning if high risk
+        if (data.attachment_score > 0) {
+            attachmentWarning.classList.remove('hidden');
+            attachmentScore.classList.add('high-risk');
+        } else {
+            attachmentWarning.classList.add('hidden');
+            attachmentScore.classList.remove('high-risk');
+        }
+        
+        // Display detection flags
+        attachmentFlags.innerHTML = '';
+        const details = data.attachment_details;
+        
+        const flagLabels = {
+            double_extension: 'Double Extension',
+            html_disguised: 'HTML Disguised as Other Format',
+            mime_mismatch: 'MIME Type Mismatch',
+            high_risk_type: 'High-Risk File Type'
+        };
+        
+        Object.keys(flagLabels).forEach(key => {
+            const li = document.createElement('li');
+            const value = details[key];
+            const isDetected = value === true || value === 'Yes' || value === 'yes';
+            
+            li.className = isDetected ? 'flag-detected' : 'flag-safe';
+            li.innerHTML = `
+                <i class="fas fa-${isDetected ? 'exclamation-circle' : 'check-circle'}"></i>
+                <span>${flagLabels[key]}: <strong>${isDetected ? 'Detected' : 'Not Detected'}</strong></span>
+            `;
+            attachmentFlags.appendChild(li);
+        });
+    } else {
+        attachmentContainer.classList.add('hidden');
+    }
+    
     // Show results
     results.classList.remove('hidden');
     

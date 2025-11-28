@@ -762,6 +762,106 @@ body::after {
     word-break: break-all;
 }
 
+/* Attachment Analysis */
+.attachment-container {
+    margin-bottom: 20px;
+}
+
+.attachment-score {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-color);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.attachment-score .label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.attachment-score .score {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--success-color);
+}
+
+.attachment-score .score.high-risk {
+    color: var(--danger-color);
+}
+
+.attachment-warning {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(220, 38, 38, 0.1);
+    border: 2px solid var(--danger-color);
+    border-radius: 8px;
+    color: var(--danger-color);
+    margin-bottom: 16px;
+}
+
+.attachment-warning i {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.attachment-details h4 {
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.attachment-flags {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.attachment-flags li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: var(--bg-color);
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+}
+
+.attachment-flags li.flag-detected {
+    border-left-color: var(--danger-color);
+    background: rgba(220, 38, 38, 0.05);
+}
+
+.attachment-flags li.flag-detected i {
+    color: var(--danger-color);
+}
+
+.attachment-flags li.flag-safe {
+    border-left-color: var(--success-color);
+}
+
+.attachment-flags li.flag-safe i {
+    color: var(--success-color);
+}
+
+.attachment-flags li i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.attachment-flags li span {
+    color: var(--text-primary);
+}
+
+.attachment-flags li strong {
+    font-weight: 600;
+}
+
 /* Actions */
 .actions {
     display: flex;
