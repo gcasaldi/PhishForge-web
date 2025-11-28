@@ -753,6 +753,11 @@ body::after {
 /* Attachment Analysis */
 .attachment-container {
     margin-bottom: 30px;
+    display: block;
+}
+
+.attachment-container.hidden {
+    display: none !important;
 }
 
 .attachment-score {

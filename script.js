@@ -362,12 +362,24 @@ function displayResults(data, mode = 'email') {
     const attachmentContainer = document.getElementById('attachmentContainer');
     const attachmentContent = document.getElementById('attachmentContent');
     
-    if (data.attachment_score !== undefined || data.attachment_details) {
+    // Debug logging
+    console.log('Full API response:', data);
+    console.log('Attachment score:', data.attachment_score);
+    console.log('Attachment details:', data.attachment_details);
+    
+    const attachmentScore = data.attachment_score;
+    const attachmentDetails = data.attachment_details;
+    
+    // Check if attachment data exists (even if score is 0)
+    if (attachmentScore !== undefined && attachmentScore !== null && attachmentDetails) {
+        console.log('Rendering attachment analysis section');
+        
         attachmentContainer.classList.remove('hidden');
+        attachmentContainer.style.display = 'block';
         attachmentContent.innerHTML = '';
         
-        const score = data.attachment_score || 0;
-        const details = data.attachment_details || {};
+        const score = attachmentScore;
+        const details = attachmentDetails;
         
         // Score display
         const scoreDiv = document.createElement('div');
@@ -424,8 +436,11 @@ function displayResults(data, mode = 'email') {
         });
         
         attachmentContent.appendChild(detailsDiv);
+        console.log('Attachment analysis section rendered successfully');
     } else {
+        console.log('No attachment data found, hiding section');
         attachmentContainer.classList.add('hidden');
+        attachmentContainer.style.display = 'none';
     }
     
     // Show results
