@@ -248,9 +248,28 @@ body::after {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
     margin-bottom: 20px;
+}
+
+@media (min-width: 1400px) {
+    .stats-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }
 
 .stat-card {
@@ -304,9 +323,19 @@ body::after {
     color: var(--neon-blue);
 }
 
-.stat-icon.high-risk {
+.stat-icon.low-risk {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 200, 100, 0.1));
+    color: var(--success-color);
+}
+
+.stat-icon.medium-risk {
     background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 140, 0, 0.1));
     color: var(--warning-color);
+}
+
+.stat-icon.high-risk {
+    background: linear-gradient(135deg, rgba(255, 100, 0, 0.2), rgba(255, 80, 0, 0.1));
+    color: #ff6400;
 }
 
 .stat-icon.critical {
@@ -686,7 +715,32 @@ body::after {
     font-weight: 700;
 }
 
-/* Risk Levels */
+/* Risk Levels - Using backend classification (low, medium, high, critical) */
+.risk-critical {
+    border-color: #dc143c;
+    box-shadow: 0 0 40px rgba(220, 20, 60, 0.5);
+    animation: criticalPulse 1.5s ease-in-out infinite;
+}
+
+.risk-critical .risk-icon i {
+    color: #dc143c;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.risk-critical .risk-info h2 {
+    color: #dc143c;
+    text-shadow: 0 0 10px rgba(220, 20, 60, 0.5);
+}
+
+@keyframes criticalPulse {
+    0%, 100% {
+        box-shadow: 0 0 40px rgba(220, 20, 60, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(220, 20, 60, 0.8);
+    }
+}
+
 .risk-high {
     border-color: var(--danger-color);
     box-shadow: 0 0 30px rgba(255, 51, 102, 0.3);
@@ -778,6 +832,21 @@ body::after {
     }
     100% {
         transform: translateX(100%);
+    }
+}
+
+.risk-bar-fill.critical {
+    background: linear-gradient(90deg, #dc143c, #ff1744);
+    box-shadow: 0 0 15px #dc143c;
+    animation: criticalBarPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes criticalBarPulse {
+    0%, 100% {
+        box-shadow: 0 0 15px #dc143c;
+    }
+    50% {
+        box-shadow: 0 0 25px #ff1744;
     }
 }
 

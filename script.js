@@ -51,12 +51,19 @@ async function fetchStats() {
         }
         
         const data = await response.json();
+        
+        // DUMB FRONTEND PRINCIPLE:
+        // Consume backend data directly without any classification logic
+        // Backend provides pre-classified risk_level categories (low, medium, high, critical)
+        // Frontend only displays the numbers - no thresholds, no calculations
         updateStatsDisplay(data);
     } catch (error) {
         console.error('Error fetching stats:', error);
-        // Show placeholder values if API fails
+        // Show placeholder values if API fails - no frontend logic, just display
         updateStatsDisplay({
             total_analyzed: '-',
+            low_risk: '-',
+            medium_risk: '-',
             high_risk: '-',
             critical_risk: '-'
         });
@@ -66,17 +73,27 @@ async function fetchStats() {
 // Update statistics display
 function updateStatsDisplay(stats) {
     const totalAnalyzed = document.getElementById('totalAnalyzed');
+    const lowRisk = document.getElementById('lowRisk');
+    const mediumRisk = document.getElementById('mediumRisk');
     const highRisk = document.getElementById('highRisk');
     const criticalRisk = document.getElementById('criticalRisk');
     
+    // Display data directly from backend without any frontend logic
+    // Backend provides risk_level classification (low, medium, high, critical)
     if (totalAnalyzed) {
-        animateNumber(totalAnalyzed, stats.total_analyzed);
+        animateNumber(totalAnalyzed, stats.total_analyzed || 0);
+    }
+    if (lowRisk) {
+        animateNumber(lowRisk, stats.low_risk || stats.low_count || 0);
+    }
+    if (mediumRisk) {
+        animateNumber(mediumRisk, stats.medium_risk || stats.medium_count || 0);
     }
     if (highRisk) {
-        animateNumber(highRisk, stats.high_risk);
+        animateNumber(highRisk, stats.high_risk || stats.high_count || 0);
     }
     if (criticalRisk) {
-        animateNumber(criticalRisk, stats.critical_risk);
+        animateNumber(criticalRisk, stats.critical_risk || stats.critical_count || 0);
     }
 }
 
@@ -331,23 +348,32 @@ function displayResults(data, mode = 'email') {
     const riskBarFill = document.getElementById('riskBarFill');
     const recommendation = document.getElementById('recommendation').querySelector('p');
     
-    // Map risk levels (handles various formats)
+    // DUMB FRONTEND PRINCIPLE:
+    // Use risk_level directly from backend (low, medium, high, critical)
+    // No frontend logic to determine risk - backend decides classification
     const riskLevelNormalized = data.risk_level ? data.risk_level.toLowerCase() : 'low';
     
     // Risk messages mapping - English only
     const riskMessages = {
         low: "Low risk. No clear phishing indicators were detected, but stay cautious and verify the sender if something feels unusual.",
         medium: "Medium risk. Some suspicious patterns were found. Double-check the sender and links before clicking or sharing any information.",
-        high: "High risk. This message matches common phishing patterns. Do not click any links or share credentials. Treat it as a likely phishing attempt."
+        high: "High risk. This message matches common phishing patterns. Do not click any links or share credentials. Treat it as a likely phishing attempt.",
+        critical: "🚨 CRITICAL THREAT: Immediate danger detected. This is a confirmed phishing attack. Do NOT interact with this message. Delete immediately and report to security."
     };
     
-    // Configure colors and icons based on risk level
+    // Configure colors and icons based on risk level from backend
     let colorClass = '';
     let iconClass = '';
     let riskLevelText = '';
     let recommendationText = '';
     
     switch(riskLevelNormalized) {
+        case 'critical':
+            colorClass = 'risk-critical';
+            iconClass = 'fa-skull-crossbones';
+            riskLevelText = 'CRITICAL THREAT';
+            recommendationText = riskMessages.critical;
+            break;
         case 'high':
             colorClass = 'risk-high';
             iconClass = 'fa-exclamation-triangle';
