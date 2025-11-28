@@ -360,46 +360,70 @@ function displayResults(data, mode = 'email') {
     
     // Attachment Analysis
     const attachmentContainer = document.getElementById('attachmentContainer');
-    const attachmentScore = document.getElementById('attachmentScore');
-    const attachmentWarning = document.getElementById('attachmentWarning');
-    const attachmentFlags = document.getElementById('attachmentFlags');
+    const attachmentContent = document.getElementById('attachmentContent');
     
-    if (data.attachment_score !== undefined && data.attachment_details) {
+    if (data.attachment_score !== undefined || data.attachment_details) {
         attachmentContainer.classList.remove('hidden');
-        attachmentScore.textContent = data.attachment_score;
+        attachmentContent.innerHTML = '';
         
-        // Show warning if high risk
-        if (data.attachment_score > 0) {
-            attachmentWarning.classList.remove('hidden');
-            attachmentScore.classList.add('high-risk');
-        } else {
-            attachmentWarning.classList.add('hidden');
-            attachmentScore.classList.remove('high-risk');
+        const score = data.attachment_score || 0;
+        const details = data.attachment_details || {};
+        
+        // Score display
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = `attachment-score ${score > 0 ? 'high-risk' : ''}`;
+        scoreDiv.innerHTML = `
+            <span class="attachment-score-label">Risk Score:</span>
+            <span class="attachment-score-value ${score === 0 ? 'safe' : ''}">${score}</span>
+        `;
+        attachmentContent.appendChild(scoreDiv);
+        
+        // Warning banner for high-risk attachments
+        if (score > 0) {
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'attachment-warning';
+            warningDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>High-risk attachment format detected. Do NOT open this file.</span>
+            `;
+            attachmentContent.appendChild(warningDiv);
         }
         
-        // Display detection flags
-        attachmentFlags.innerHTML = '';
-        const details = data.attachment_details;
+        // Detection flags
+        const detailsDiv = document.createElement('div');
+        detailsDiv.className = 'attachment-details';
         
-        const flagLabels = {
-            double_extension: 'Double Extension',
-            html_disguised: 'HTML Disguised as Other Format',
-            mime_mismatch: 'MIME Type Mismatch',
-            high_risk_type: 'High-Risk File Type'
-        };
+        const flags = [
+            { key: 'double_extension', label: 'Double Extension', icon: 'fa-file-alt' },
+            { key: 'html_disguised', label: 'HTML Disguised', icon: 'fa-mask' },
+            { key: 'mime_mismatch', label: 'MIME Mismatch', icon: 'fa-exclamation-circle' },
+            { key: 'high_risk_type', label: 'High-Risk Type', icon: 'fa-skull-crossbones' }
+        ];
         
-        Object.keys(flagLabels).forEach(key => {
-            const li = document.createElement('li');
-            const value = details[key];
-            const isDetected = value === true || value === 'Yes' || value === 'yes';
+        flags.forEach(flag => {
+            const detailItem = document.createElement('div');
+            detailItem.className = 'attachment-detail-item';
             
-            li.className = isDetected ? 'flag-detected' : 'flag-safe';
-            li.innerHTML = `
-                <i class="fas fa-${isDetected ? 'exclamation-circle' : 'check-circle'}"></i>
-                <span>${flagLabels[key]}: <strong>${isDetected ? 'Detected' : 'Not Detected'}</strong></span>
+            const isDetected = details[flag.key] === true;
+            const statusIcon = isDetected ? 'fa-times-circle' : 'fa-check-circle';
+            const statusClass = isDetected ? 'detected' : 'safe';
+            const statusText = isDetected ? 'Detected' : 'Safe';
+            
+            detailItem.innerHTML = `
+                <div class="attachment-detail-label">
+                    <i class="fas ${flag.icon}"></i>
+                    <span>${flag.label}</span>
+                </div>
+                <div class="attachment-detail-value ${statusClass}">
+                    <span>${statusText}</span>
+                    <i class="fas ${statusIcon}"></i>
+                </div>
             `;
-            attachmentFlags.appendChild(li);
+            
+            detailsDiv.appendChild(detailItem);
         });
+        
+        attachmentContent.appendChild(detailsDiv);
     } else {
         attachmentContainer.classList.add('hidden');
     }
