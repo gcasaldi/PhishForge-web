@@ -760,6 +760,77 @@ body::after {
     display: none !important;
 }
 
+.attachments-list {
+    margin-bottom: 20px;
+}
+
+.attachments-list h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+.attachment-files-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.attachment-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--darker-card);
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.attachment-file-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+}
+
+.attachment-file-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.attachment-file-info i {
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.attachment-filename {
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.attachment-filesize {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.attachment-extension {
+    padding: 6px 14px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .attachment-score {
     display: flex;
     align-items: center;

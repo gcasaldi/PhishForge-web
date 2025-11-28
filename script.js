@@ -381,6 +381,39 @@ function displayResults(data, mode = 'email') {
         const score = attachmentScore;
         const details = attachmentDetails || {};
         
+        // Display attachments found (if any)
+        if (details.attachments && details.attachments.length > 0) {
+            const attachmentsListDiv = document.createElement('div');
+            attachmentsListDiv.className = 'attachments-list';
+            attachmentsListDiv.innerHTML = '<h4><i class="fas fa-paperclip"></i> Attachments Found:</h4>';
+            
+            const listContainer = document.createElement('div');
+            listContainer.className = 'attachment-files-container';
+            
+            details.attachments.forEach(attachment => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'attachment-file-item';
+                
+                const fileName = attachment.filename || attachment.name || 'Unknown file';
+                const fileExtension = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+                const fileSize = attachment.size ? `(${attachment.size})` : '';
+                
+                fileDiv.innerHTML = `
+                    <div class="attachment-file-info">
+                        <i class="fas fa-file"></i>
+                        <span class="attachment-filename">${escapeHtml(fileName)}</span>
+                        ${fileSize ? `<span class="attachment-filesize">${fileSize}</span>` : ''}
+                    </div>
+                    ${fileExtension ? `<span class="attachment-extension">.${fileExtension}</span>` : ''}
+                `;
+                
+                listContainer.appendChild(fileDiv);
+            });
+            
+            attachmentsListDiv.appendChild(listContainer);
+            attachmentContent.appendChild(attachmentsListDiv);
+        }
+        
         // Score display
         const scoreDiv = document.createElement('div');
         scoreDiv.className = `attachment-score ${score > 0 ? 'high-risk' : ''}`;
