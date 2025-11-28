@@ -370,16 +370,16 @@ function displayResults(data, mode = 'email') {
     const attachmentScore = data.attachment_score;
     const attachmentDetails = data.attachment_details;
     
-    // Check if attachment data exists (even if score is 0)
-    if (attachmentScore !== undefined && attachmentScore !== null && attachmentDetails) {
-        console.log('Rendering attachment analysis section');
+    // Show attachment analysis when attachment_score is not null
+    if (attachmentScore !== null && attachmentScore !== undefined) {
+        console.log('Rendering attachment analysis section - Score:', attachmentScore);
         
         attachmentContainer.classList.remove('hidden');
         attachmentContainer.style.display = 'block';
         attachmentContent.innerHTML = '';
         
         const score = attachmentScore;
-        const details = attachmentDetails;
+        const details = attachmentDetails || {};
         
         // Score display
         const scoreDiv = document.createElement('div');
