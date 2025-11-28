@@ -1,6 +1,10 @@
 // API Configuration
 const API_BASE_URL = 'https://phishforge-lite.onrender.com';
 
+// Stats update interval (10 seconds)
+const STATS_UPDATE_INTERVAL = 10000;
+let statsInterval = null;
+
 // Predefined examples
 const examples = {
     phishing: {
@@ -27,6 +31,88 @@ const analyzeUrlBtn = document.getElementById('analyzeUrlBtn');
 
 // Current mode
 let currentMode = 'email';
+
+// Event Listeners
+form.addEventListener('submit', handleSubmit);
+urlForm.addEventListener('submit', handleUrlSubmit);
+
+// Initialize stats on page load
+document.addEventListener('DOMContentLoaded', () => {
+    fetchStats(); // Fetch immediately
+    statsInterval = setInterval(fetchStats, STATS_UPDATE_INTERVAL); // Then every 10 seconds
+});
+
+// Fetch real-time statistics
+async function fetchStats() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/stats`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch statistics');
+        }
+        
+        const data = await response.json();
+        updateStatsDisplay(data);
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        // Show placeholder values if API fails
+        updateStatsDisplay({
+            total_analyzed: '-',
+            high_risk: '-',
+            critical_risk: '-'
+        });
+    }
+}
+
+// Update statistics display
+function updateStatsDisplay(stats) {
+    const totalAnalyzed = document.getElementById('totalAnalyzed');
+    const highRisk = document.getElementById('highRisk');
+    const criticalRisk = document.getElementById('criticalRisk');
+    
+    if (totalAnalyzed) {
+        animateNumber(totalAnalyzed, stats.total_analyzed);
+    }
+    if (highRisk) {
+        animateNumber(highRisk, stats.high_risk);
+    }
+    if (criticalRisk) {
+        animateNumber(criticalRisk, stats.critical_risk);
+    }
+}
+
+// Animate number changes
+function animateNumber(element, newValue) {
+    const currentValue = parseInt(element.textContent) || 0;
+    const targetValue = parseInt(newValue) || 0;
+    
+    if (currentValue === targetValue || element.textContent === '-') {
+        element.textContent = formatNumber(targetValue);
+        return;
+    }
+    
+    const duration = 500; // milliseconds
+    const steps = 20;
+    const stepValue = (targetValue - currentValue) / steps;
+    const stepDuration = duration / steps;
+    
+    let currentStep = 0;
+    const timer = setInterval(() => {
+        currentStep++;
+        const value = Math.round(currentValue + (stepValue * currentStep));
+        element.textContent = formatNumber(value);
+        
+        if (currentStep >= steps) {
+            clearInterval(timer);
+            element.textContent = formatNumber(targetValue);
+        }
+    }, stepDuration);
+}
+
+// Format number with thousands separator
+function formatNumber(num) {
+    if (isNaN(num)) return '-';
+    return num.toLocaleString('en-US');
+}
 
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
@@ -281,6 +367,9 @@ function displayResults(data, mode = 'email') {
     const backendRecommendation = data.recommendation || recommendationText;
     recommendation.textContent = translateToEnglish(backendRecommendation);
     
+    // AI Explainability Section
+    displayExplainability(data);
+    
     // Details/Findings - display as bulleted list
     const findingsContainer = document.getElementById('findingsContainer');
     findingsContainer.innerHTML = '';
@@ -336,6 +425,9 @@ function displayResults(data, mode = 'email') {
         
         findingsContainer.appendChild(findingsCard);
     }
+    
+    // AI Explainability Section
+    displayExplainability(data);
     
     // URLs
     const urlsContainer = document.getElementById('urlsContainer');
@@ -481,6 +573,90 @@ function displayResults(data, mode = 'email') {
     
     // Scroll to results
     results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Display AI Explainability
+function displayExplainability(data) {
+    const explainabilityContainer = document.getElementById('explainabilityContainer');
+    const threatLabel = document.getElementById('threatLabel');
+    const confidenceScore = document.getElementById('confidenceScore');
+    const riskFactorsList = document.getElementById('riskFactorsList');
+    
+    if (!explainabilityContainer) return;
+    
+    // Show explainability section
+    explainabilityContainer.style.display = 'block';
+    
+    // Threat classification label (legit, suspicious, phishing)
+    const label = data.label || data.classification || data.risk_level || 'Unknown';
+    threatLabel.textContent = label.toUpperCase();
+    threatLabel.className = 'classification-value';
+    
+    // Add color coding
+    const labelLower = label.toLowerCase();
+    if (labelLower.includes('phishing') || labelLower === 'high') {
+        threatLabel.classList.add('threat-high');
+    } else if (labelLower.includes('suspicious') || labelLower === 'medium') {
+        threatLabel.classList.add('threat-medium');
+    } else {
+        threatLabel.classList.add('threat-low');
+    }
+    
+    // Confidence score
+    const confidence = data.confidence_score || data.risk_score || 0;
+    confidenceScore.textContent = `${confidence}%`;
+    confidenceScore.className = 'classification-value';
+    
+    // Risk factors - why is this risky?
+    riskFactorsList.innerHTML = '';
+    
+    const riskFactors = data.risk_factors || data.factors || [];
+    
+    if (riskFactors.length > 0) {
+        const ul = document.createElement('ul');
+        ul.className = 'risk-factors-ul';
+        
+        riskFactors.forEach(factor => {
+            const li = document.createElement('li');
+            li.className = 'risk-factor-item';
+            
+            const factorText = typeof factor === 'string' ? factor : 
+                             (factor.description || factor.message || factor.reason || JSON.stringify(factor));
+            
+            li.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${escapeHtml(translateToEnglish(factorText))}</span>
+            `;
+            ul.appendChild(li);
+        });
+        
+        riskFactorsList.appendChild(ul);
+    } else {
+        // Fallback message if no risk factors provided
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.className = 'risk-factors-fallback';
+        
+        const riskLevel = (data.risk_level || '').toLowerCase();
+        
+        if (riskLevel === 'low') {
+            fallbackDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <p>No significant risk factors detected. This message appears legitimate based on our analysis.</p>
+            `;
+        } else if (riskLevel === 'medium') {
+            fallbackDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Some suspicious patterns detected. Review the analysis details carefully before taking action.</p>
+            `;
+        } else {
+            fallbackDiv.innerHTML = `
+                <i class="fas fa-shield-alt"></i>
+                <p>Multiple phishing indicators identified. See analysis details below for specific concerns.</p>
+            `;
+        }
+        
+        riskFactorsList.appendChild(fallbackDiv);
+    }
 }
 
 // Create element for a finding

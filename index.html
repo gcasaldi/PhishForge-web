@@ -20,9 +20,69 @@
 
         <!-- Hero Section -->
         <section class="hero">
-            <h2 class="hero-title">PhishForge - AI-Powered Phishing Detection</h2>
-            <p class="hero-subtitle">Advanced machine learning technology to protect you from phishing attacks in real-time</p>
+            <h2 class="hero-title">PhishForge</h2>
+            <p class="hero-subtitle">AI-powered phishing detection & threat intelligence</p>
         </section>
+
+        <!-- Real-Time Statistics Dashboard -->
+        <div id="statsContainer" class="stats-container">
+            <div class="stats-header">
+                <h3><i class="fas fa-chart-line"></i> Threat Intelligence Dashboard</h3>
+                <div class="stats-status">
+                    <span class="status-indicator live"></span>
+                    <span class="status-text">LIVE</span>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon analyzed">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalAnalyzed">-</div>
+                        <div class="stat-label">Total Analyzed</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Real-time data</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon high-risk">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="highRisk">-</div>
+                        <div class="stat-label">High Risk Detected</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Threats blocked</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon critical">
+                        <i class="fas fa-skull-crossbones"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="criticalRisk">-</div>
+                        <div class="stat-label">Critical Threats</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-bolt"></i>
+                            <span>Immediate action</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-footer">
+                <i class="fas fa-info-circle"></i>
+                <p>Anonymous statistics generated in real-time. PhishForge analyzes only volumes, not personal data.</p>
+            </div>
+        </div>
 
         <!-- Analysis Form -->
         <div class="card form-card">
@@ -145,6 +205,36 @@
                 <div class="recommendation" id="recommendation">
                     <i class="fas fa-info-circle"></i>
                     <p></p>
+                </div>
+            </div>
+
+            <!-- AI Explainability Section -->
+            <div id="explainabilityContainer" class="explainability-container">
+                <div class="card explainability-card">
+                    <div class="explainability-header">
+                        <h3><i class="fas fa-brain"></i> AI Analysis Explanation</h3>
+                        <span class="ai-badge">
+                            <i class="fas fa-robot"></i> ML-Powered
+                        </span>
+                    </div>
+                    
+                    <div class="threat-classification">
+                        <div class="classification-item">
+                            <span class="classification-label">Threat Classification</span>
+                            <span class="classification-value" id="threatLabel">-</span>
+                        </div>
+                        <div class="classification-item">
+                            <span class="classification-label">Confidence Score</span>
+                            <span class="classification-value" id="confidenceScore">-</span>
+                        </div>
+                    </div>
+
+                    <div class="explainability-section">
+                        <h4><i class="fas fa-exclamation-circle"></i> Why is this email risky?</h4>
+                        <div id="riskFactorsList" class="risk-factors-list">
+                            <!-- Risk factors will be inserted here -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
