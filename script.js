@@ -56,13 +56,6 @@ async function fetchStats() {
         // Consume backend data directly without any classification logic
         // Backend provides pre-classified risk_level categories (low, medium, high, critical)
         // Frontend only displays the numbers - no thresholds, no calculations
-        //
-        // NOTE: Current backend /stats endpoint returns only high_risk and critical_risk
-        // TODO: Backend should be updated to return complete breakdown:
-        //   - low_risk (or low_count)
-        //   - medium_risk (or medium_count)  
-        //   - high_risk
-        //   - critical_risk
         updateStatsDisplay(data);
     } catch (error) {
         console.error('Error fetching stats:', error);
@@ -85,48 +78,22 @@ function updateStatsDisplay(stats) {
     const highRisk = document.getElementById('highRisk');
     const criticalRisk = document.getElementById('criticalRisk');
     
-    // Display data directly from backend without any frontend logic
-    // Backend provides risk_level classification (low, medium, high, critical)
-    
-    const total = parseInt(stats.total_analyzed) || 0;
-    const high = parseInt(stats.high_risk || stats.high_count || 0);
-    const critical = parseInt(stats.critical_risk || stats.critical_count || 0);
-    
-    // If backend doesn't provide low/medium, calculate from total
-    // NOTE: This is a temporary workaround - ideally backend should provide all counts
-    let low = parseInt(stats.low_risk || stats.low_count || 0);
-    let medium = parseInt(stats.medium_risk || stats.medium_count || 0);
-    
-    // If low and medium are not provided by backend, calculate remaining
-    if (stats.low_risk === undefined && stats.low_count === undefined) {
-        const accounted = high + critical;
-        const remaining = total - accounted;
-        
-        // If medium is also missing, we can't determine the split
-        // So we show remaining as "other" or split equally
-        if (stats.medium_risk === undefined && stats.medium_count === undefined) {
-            // Assume remaining are split between low and medium (or all are low if small)
-            medium = Math.floor(remaining * 0.3); // 30% medium
-            low = remaining - medium; // rest are low
-        } else {
-            low = remaining - medium;
-        }
-    }
-    
+    // DUMB FRONTEND: Display data directly from backend
+    // Backend provides complete risk_level breakdown
     if (totalAnalyzed) {
-        animateNumber(totalAnalyzed, total);
+        animateNumber(totalAnalyzed, stats.total_analyzed || 0);
     }
     if (lowRisk) {
-        animateNumber(lowRisk, low);
+        animateNumber(lowRisk, stats.low_risk || 0);
     }
     if (mediumRisk) {
-        animateNumber(mediumRisk, medium);
+        animateNumber(mediumRisk, stats.medium_risk || 0);
     }
     if (highRisk) {
-        animateNumber(highRisk, high);
+        animateNumber(highRisk, stats.high_risk || 0);
     }
     if (criticalRisk) {
-        animateNumber(criticalRisk, critical);
+        animateNumber(criticalRisk, stats.critical_risk || 0);
     }
 }
 
