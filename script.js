@@ -1,10 +1,6 @@
 // API Configuration
 const API_BASE_URL = 'https://phishforge-lite.onrender.com';
 
-// Stats update interval (10 seconds)
-const STATS_UPDATE_INTERVAL = 10000;
-let statsInterval = null;
-
 // Predefined examples
 const examples = {
     phishing: {
@@ -35,101 +31,6 @@ let currentMode = 'email';
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
 urlForm.addEventListener('submit', handleUrlSubmit);
-
-// Initialize stats on page load
-document.addEventListener('DOMContentLoaded', () => {
-    fetchStats(); // Fetch immediately
-    statsInterval = setInterval(fetchStats, STATS_UPDATE_INTERVAL); // Then every 10 seconds
-});
-
-// Fetch real-time statistics
-async function fetchStats() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/stats`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch statistics');
-        }
-        
-        const data = await response.json();
-        
-        // DUMB FRONTEND PRINCIPLE:
-        // Consume backend data directly without any classification logic
-        // Backend provides pre-classified risk_level categories (low, medium, high, critical)
-        // Frontend only displays the numbers - no thresholds, no calculations
-        updateStatsDisplay(data);
-    } catch (error) {
-        console.error('Error fetching stats:', error);
-        // Show placeholder values if API fails - no frontend logic, just display
-        updateStatsDisplay({
-            total_analyzed: '-',
-            low_risk: '-',
-            medium_risk: '-',
-            high_risk: '-',
-            critical_risk: '-'
-        });
-    }
-}
-
-// Update statistics display
-function updateStatsDisplay(stats) {
-    const totalAnalyzed = document.getElementById('totalAnalyzed');
-    const lowRisk = document.getElementById('lowRisk');
-    const mediumRisk = document.getElementById('mediumRisk');
-    const highRisk = document.getElementById('highRisk');
-    const criticalRisk = document.getElementById('criticalRisk');
-    
-    // DUMB FRONTEND: Display data directly from backend
-    // Backend provides complete risk_level breakdown
-    if (totalAnalyzed) {
-        animateNumber(totalAnalyzed, stats.total_analyzed || 0);
-    }
-    if (lowRisk) {
-        animateNumber(lowRisk, stats.low_risk || 0);
-    }
-    if (mediumRisk) {
-        animateNumber(mediumRisk, stats.medium_risk || 0);
-    }
-    if (highRisk) {
-        animateNumber(highRisk, stats.high_risk || 0);
-    }
-    if (criticalRisk) {
-        animateNumber(criticalRisk, stats.critical_risk || 0);
-    }
-}
-
-// Animate number changes
-function animateNumber(element, newValue) {
-    const currentValue = parseInt(element.textContent) || 0;
-    const targetValue = parseInt(newValue) || 0;
-    
-    if (currentValue === targetValue || element.textContent === '-') {
-        element.textContent = formatNumber(targetValue);
-        return;
-    }
-    
-    const duration = 500; // milliseconds
-    const steps = 20;
-    const stepValue = (targetValue - currentValue) / steps;
-    const stepDuration = duration / steps;
-    
-    let currentStep = 0;
-    const timer = setInterval(() => {
-        currentStep++;
-        const value = Math.round(currentValue + (stepValue * currentStep));
-        element.textContent = formatNumber(value);
-        
-        if (currentStep >= steps) {
-            clearInterval(timer);
-            element.textContent = formatNumber(targetValue);
-        }
-    }, stepDuration);
-}
-
-// Format number with thousands separator
-function formatNumber(num) {
-    if (isNaN(num)) return '-';
-    return num.toLocaleString('en-US');
-}
 
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
