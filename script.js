@@ -1,6 +1,5 @@
-// API Configuration - Locale (più veloce e sicura)
-// Usa l'API locale invece di Render per migliori prestazioni
-const API_BASE_URL = 'http://127.0.0.1:8000';
+// API Configuration
+const API_BASE_URL = 'https://phishforge-lite.onrender.com';
 
 // Predefined examples
 const examples = {
