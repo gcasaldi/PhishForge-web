@@ -99,9 +99,14 @@ async function handleUrlSubmit(e) {
     }
 }
 
-// API call
-async function analyzeEmail(sender, subject, body) {
+// API call with retry logic
+async function analyzeEmail(sender, subject, body, retryCount = 0) {
+    const MAX_RETRIES = 2;
+    
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
         const response = await fetch(`${API_BASE_URL}/analyze`, {
             method: 'POST',
             headers: {
@@ -111,28 +116,44 @@ async function analyzeEmail(sender, subject, body) {
                 sender: sender,
                 subject: subject,
                 body: body
-            })
+            }),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Analysis error. Please try again later.');
+            throw new Error(errorData.error || 'Errore nell\'analisi. Riprova più tardi.');
         }
         
         return await response.json();
     } catch (error) {
         console.error('Error:', error);
+        
+        // Retry logic for network errors
+        if (retryCount < MAX_RETRIES && (error.name === 'TypeError' || error.name === 'AbortError')) {
+            console.log(`Tentativo ${retryCount + 1}/${MAX_RETRIES + 1} fallito, riprovo...`);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+            return analyzeEmail(sender, subject, body, retryCount + 1);
+        }
+        
         // Network error handling
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error('Connection error. Check your internet connection and try again.');
+        if (error.name === 'TypeError' || error.name === 'AbortError') {
+            throw new Error('⚠️ Impossibile connettersi al server. Assicurati che l\'API locale sia avviata (esegui: python local_api.py)');
         }
         throw error;
     }
 }
 
-// URL analysis API call
-async function analyzeUrl(url) {
+// URL analysis API call with retry logic
+async function analyzeUrl(url, retryCount = 0) {
+    const MAX_RETRIES = 2;
+    
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
         const response = await fetch(`${API_BASE_URL}/analyze-url`, {
             method: 'POST',
             headers: {
@@ -140,20 +161,31 @@ async function analyzeUrl(url) {
             },
             body: JSON.stringify({
                 url: url
-            })
+            }),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Analysis error. Please try again later.');
+            throw new Error(errorData.error || 'Errore nell\'analisi. Riprova più tardi.');
         }
         
         return await response.json();
     } catch (error) {
         console.error('Error:', error);
+        
+        // Retry logic for network errors
+        if (retryCount < MAX_RETRIES && (error.name === 'TypeError' || error.name === 'AbortError')) {
+            console.log(`Tentativo ${retryCount + 1}/${MAX_RETRIES + 1} fallito, riprovo...`);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+            return analyzeUrl(url, retryCount + 1);
+        }
+        
         // Network error handling
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error('Connection error. Check your internet connection and try again.');
+        if (error.name === 'TypeError' || error.name === 'AbortError') {
+            throw new Error('⚠️ Impossibile connettersi al server. Assicurati che l\'API locale sia avviata (esegui: python local_api.py)');
         }
         throw error;
     }
