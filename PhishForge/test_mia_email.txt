@@ -1,0 +1,10 @@
+Dear Customer,
+
+Your Amazon account has been locked due to suspicious activity!
+
+Click here immediately to verify: http://amazon-verify.tk/login
+
+If you don't verify within 24 hours, your account will be permanently deleted!!!
+
+Thank you,
+Amazon Security Team

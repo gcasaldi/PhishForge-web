@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhishForge - Enterprise Phishing Detection</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+    }
+    
+    h1 {
+      color: #2d3748;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #718096;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    
+    .badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    form {
+      margin-bottom: 30px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      transition: border 0.3s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .result-container {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f7fafc;
+      border-radius: 12px;
+      display: none;
+    }
+    
+    .result-container.show {
+      display: block;
+    }
+    
+    .risk-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin: 10px 0;
+    }
+    
+    .risk-LOW {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    
+    .risk-MEDIUM {
+      background: #feebc8;
+      color: #7c2d12;
+    }
+    
+    .risk-HIGH {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+    
+    .score-display {
+      font-size: 3rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .findings-list {
+      margin-top: 20px;
+    }
+    
+    .finding-item {
+      padding: 12px;
+      margin: 10px 0;
+      background: white;
+      border-left: 4px solid #667eea;
+      border-radius: 4px;
+    }
+    
+    .finding-category {
+      font-weight: bold;
+      color: #667eea;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+    
+    .risk-factors {
+      margin-top: 20px;
+      padding: 15px;
+      background: #edf2f7;
+      border-radius: 8px;
+    }
+    
+    .risk-factors h3 {
+      margin-bottom: 10px;
+      color: #2d3748;
+    }
+    
+    .risk-factors ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .risk-factors li {
+      padding: 6px 0;
+      color: #4a5568;
+      border-bottom: 1px solid #cbd5e0;
+    }
+    
+    .risk-factors li:last-child {
+      border-bottom: none;
+    }
+    
+    .stats-display {
+      margin-top: 30px;
+      padding: 20px;
+      background: #edf2f7;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .error-message {
+      background: #fed7d7;
+      color: #742a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 1.2rem;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ PhishForge <span class="badge">ENTERPRISE</span></h1>
+    <p class="subtitle">SOC-Grade AI Phishing Detection with Full Explainability</p>
+
+    <form id="analyze-form">
+      <label for="sender">📧 Sender Email</label>
+      <input type="text" id="sender" placeholder="e.g., support@company.com" />
+
+      <label for="subject">📝 Subject</label>
+      <input type="text" id="subject" placeholder="e.g., Urgent: Account Verification" />
+
+      <label for="body">📄 Email Body</label>
+      <textarea id="body" rows="6" placeholder="Paste the email content here..."></textarea>
+      
+      <label for="attachment_filename">📎 Attachment (optional)</label>
+      <input type="text" id="attachment_filename" placeholder="e.g., invoice.pdf.exe" />
+
+      <button type="submit">🔍 Analyze Email</button>
+    </form>
+
+    <div id="result-container" class="result-container">
+      <div id="result-content"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

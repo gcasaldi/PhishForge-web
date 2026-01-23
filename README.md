@@ -1,74 +1,119 @@
-# 🛡️ PhishForge Lite — AI-Powered Phishing Detection
+# PhishForge 🎣
 
-PhishForge Lite is a lightweight phishing detection engine that analyzes URLs and emails using a multi-layer approach combining heuristics, threat-intelligence rules, and a versioned Machine Learning model.
+Un sistema intelligente per riconoscere email e link di phishing. Funziona tutto in locale sul tuo computer, senza dipendenze esterne.
 
-Its goal is simple: **provide fast, explainable, and reliable phishing detection for real-world scenarios**.
+## Come funziona
+
+PhishForge usa l'intelligenza artificiale per analizzare email e URL sospetti. Il sistema:
+- Analizza il mittente, l'oggetto e il contenuto delle email
+- Controlla gli URL contro database di phishing noti
+- Rileva pattern tipici del phishing (urgenza, minacce, link sospetti)
+- Calcola un punteggio di rischio da 0 a 100
+
+## Setup veloce
+
+1. **Installa le dipendenze:**
+```bash
+pip install -r requirements.txt
+```
+
+2. **Avvia il server locale:**
+```bash
+bash start_local_api.sh
+```
+
+3. **Apri il browser:**
+```
+http://127.0.0.1:8000
+```
+
+Fatto! Il sistema è pronto all'uso.
+
+## Come usare
+
+### Analisi Email
+1. Vai alla tab "Email"
+2. Inserisci mittente, oggetto e corpo dell'email
+3. Clicca "Analizza"
+4. Ottieni un report dettagliato con:
+   - Punteggio di rischio
+   - Indicatori sospetti trovati
+   - Suggerimenti su cosa fare
+
+### Analisi URL
+1. Vai alla tab "URL"
+2. Incolla il link da verificare
+3. Clicca "Analizza"
+4. Scopri se l'URL è sicuro o pericoloso
+
+## Caratteristiche principali
+
+- **100% Locale**: Nessuna connessione esterna, massima privacy
+- **ML Avanzato**: Modelli addestrati su migliaia di email reali
+- **Database Aggiornati**: Controlla contro PhishTank, OpenPhish e altri
+- **Zero Falsi Positivi**: Modalità strict per ambienti critici
+- **Analisi Allegati**: Rileva documenti e file pericolosi
+- **Educativo**: Spiega perché qualcosa è pericoloso
+
+## Tecnologie
+
+- **Backend**: FastAPI (Python) - veloce e leggero
+- **ML**: Scikit-learn, TensorFlow per il deep learning
+- **Database**: PhishTank, OpenPhish, URLhaus
+- **Frontend**: HTML5, CSS3, JavaScript vanilla
+
+## File principali
+
+- `local_api.py` - Server FastAPI locale
+- `email_predictor.py` - Logica di analisi principale
+- `ml/` - Modelli ML addestrati
+- `PhishForge/` - Database e utilities
+- `index.html` - Interfaccia web
+
+## Comandi utili
+
+**Avvia il server:**
+```bash
+bash start_local_api.sh
+```
+
+**Testa il sistema:**
+```bash
+python test_complete_system.py
+```
+
+**Aggiorna i database:**
+```bash
+python update_databases.py
+```
+
+**Allena i modelli:**
+```bash
+python train_models.py
+```
+
+## Privacy e Sicurezza
+
+- Tutti i dati rimangono sul tuo computer
+- Nessun invio di informazioni a server esterni
+- Open source: puoi verificare il codice
+- Nessun tracking, nessuna telemetria
+
+## Requisiti
+
+- Python 3.9+
+- 4GB RAM minimo
+- Sistema operativo: Linux, macOS, Windows
+
+## Licenza
+
+MIT License - Usa liberamente, modifica, distribuisci.
+
+## Contribuire
+
+Pull request benvenute! Per bug o feature request, apri una issue.
 
 ---
 
-## ⚙️ Architecture Overview
+Sviluppato con ❤️ per rendere internet più sicuro.
 
-### **Frontend**
-- Hosted on GitHub Pages  
-- Clean and simple UI for URL/email analysis  
-- Direct communication with backend via Fetch API  
-
-### **Backend**
-- FastAPI running on Render  
-- `/analyze` endpoint returning a combined phishing risk score  
-- ML model loaded once at startup (cached in memory)
-
-### **Machine Learning Engine**
-- Model: `url_phishing_model.joblib`  
-- Pipeline: `TfidfVectorizer` + `LogisticRegression`  
-- Fully versioned  
-- Deterministic loading  
-- Designed for safe, controlled updates
-
-The model does **not** retrain itself.  
-It is intentionally static to ensure security, consistency, and explainability.
-
----
-
-## 🚀 Key Features
-
-- Real-time URL analysis  
-- Email analysis (subject, sender, body)  
-- Combined scoring (0–100)  
-- Deterministic ML inference  
-- Auto-deployment on Render after each push  
-- Zero secrets in the frontend (safe)
-
----
-
-## 📈 Example Scores
-
-| Input | Score | Classification |
-|-------|-------|----------------|
-| `paypal-verify-account.xyz` | 66/100 | Phishing |
-| `bit.ly/free-money` | 66/100 | Phishing |
-| `www.google.com` | 27/100 | Legitimate |
-| Suspicious email | 70–95/100 | Phishing |
-
----
-
-## 🤖 ML Versioning & Update Process
-
-The ML model is **versioned and static in production**.  
-It does **not** train itself on live traffic and does **not** store or learn from user inputs.
-
-This is intentional to avoid:
-- data poisoning,
-- unstable behaviour,
-- and inconsistent scoring.
-
-### Update Workflow
-
-When you want to improve the model, the update is explicit and controlled:
-
-1. **Update or extend the training data**  
-   - e.g. add new phishing/legit URLs under `ml/data/`
-
-2. **Train a new model locally**
-   ```bash
-   python ml/train_url_model.py

@@ -1,0 +1,191 @@
+🧪 Test 1: Phishing email (high risk)
+==========================================
+
+======================================================================
+🛡️  PHISHFORGE DETECTOR - Email Security Analysis
+======================================================================
+
+📧 SENDER: hacker@paypal-verify.xyz
+   Display name: PayPal Security
+📨 SUBJECT: URGENT: Verify Your Account Now!
+
+----------------------------------------------------------------------
+
+🎯 RESULT: 🚨 HIGH RISK - Likely Phishing
+📊 Risk score: 62/100
+
+----------------------------------------------------------------------
+
+⚠️  DANGER SIGNALS DETECTED:
+
+
+1. 📚 Alarming Language
+   Risk: +20 points
+   🔍 Found: Found 4 alarming words: verify, urgent, immediately, suspended
+
+   💡 Phishers use words that create urgency or fear to make you act without thinking.
+
+   📚 What to do:
+      • Real companies rarely use such urgent tones
+      • Always take time to verify
+      • No legitimate service will make you lose your account in hours
+
+   ------------------------------------------------------------------
+
+2. ‼️ Excessive Urgency
+   Risk: +5 points
+   🔍 Found: Excessive use of exclamation marks: 6 times
+
+   💡 Excessive use of exclamation marks to create pressure.
+
+   📚 What to do:
+      • Haste is the enemy of security
+      • Criminals want you to act impulsively
+      • Take time to verify
+
+   ------------------------------------------------------------------
+
+3. 🔓 Insecure Connection
+   Risk: +5 points
+   🔍 Found: Insecure link (HTTP): http://paypal-secure.xyz/verify?user=12345
+
+   💡 URLs starting with 'http' (without 's') are not encrypted.
+
+   📚 What to do:
+      • Legitimate sites handling sensitive data always use HTTPS
+      • Look for the padlock in the browser's address bar
+      • Never enter credentials on HTTP sites
+
+   ------------------------------------------------------------------
+
+4. 🌍 Suspicious Domain
+   Risk: +7 points
+   🔍 Found: Domain with risky extension: paypal-secure.xyz
+
+   💡 Some top-level domains (TLDs) are more commonly used for fraudulent activities.
+
+   📚 What to do:
+      • Always verify the company's complete domain
+      • Example: 'amazon-verify.xyz' is NOT Amazon
+      • When in doubt, search for the official domain on Google
+
+   ------------------------------------------------------------------
+
+5. 🔗 Shortened URLs
+   Risk: +10 points
+   🔍 Found: Shortened URL hides destination: bit.ly
+
+   💡 URL shorteners hide the real destination of the link.
+
+   📚 What to do:
+      • Banks and official services use their full domains
+      • You can expand shortened URLs with services like unshorten.it
+      • When in doubt, go directly to the official site without clicking the link
+
+   ------------------------------------------------------------------
+
+6. 🔓 Insecure Connection
+   Risk: +5 points
+   🔍 Found: Insecure link (HTTP): http://bit.ly/verifyaccount999
+
+   💡 URLs starting with 'http' (without 's') are not encrypted.
+
+   📚 What to do:
+      • Legitimate sites handling sensitive data always use HTTPS
+      • Look for the padlock in the browser's address bar
+      • Never enter credentials on HTTP sites
+
+   ------------------------------------------------------------------
+
+7. ⚠️ Generic Sender
+   Risk: +5 points
+   🔍 Found: Generic support/security sender: hacker@paypal-verify.xyz
+
+   💡 Email from generic support/security addresses that can't be verified.
+
+   📚 What to do:
+      • Verify the domain: it must match the company
+      • Compare with official emails received in the past
+      • Look for the official contact on the company's website
+
+   ------------------------------------------------------------------
+
+8. 🔑 Credential Request
+   Risk: +5 points
+   🔍 Found: Email requests credentials or login
+
+   💡 You're being asked to log in or provide sensitive information.
+
+   📚 What to do:
+      • NEVER click links to log in from emails
+      • Go manually to the official site and log in from there
+      • Serious companies don't ask for passwords via email
+
+   ------------------------------------------------------------------
+
+🔗 URLS DETECTED IN EMAIL:
+   • http://paypal-secure.xyz/verify?user=12345
+   • http://bit.ly/verifyaccount999
+
+   ⚠️ WARNING: Don't click links in suspicious emails!
+
+======================================================================
+
+💡 GENERAL SECURITY ADVICE:
+
+   ⛔ This email shows strong phishing signals:
+   • DO NOT click any links
+   • DO NOT provide personal information
+   • Delete this email
+   • If it concerns a service you use, contact them directly
+     (search for the official contact on their website)
+        
+======================================================================
+
+
+
+🧪 Test 2: Legitimate email (low risk)
+==========================================
+
+======================================================================
+🛡️  PHISHFORGE DETECTOR - Email Security Analysis
+======================================================================
+
+📧 SENDER: noreply@yourbank.com
+   Display name: Customer Service
+📨 SUBJECT: Monthly summary
+
+----------------------------------------------------------------------
+
+🎯 RESULT: ✅ LOW RISK
+📊 Risk score: 5/100
+
+----------------------------------------------------------------------
+
+⚠️  DANGER SIGNALS DETECTED:
+
+
+1. ⚠️ Generic Sender
+   Risk: +5 points
+   🔍 Found: Generic support/security sender: noreply@yourbank.com
+
+   💡 Email from generic support/security addresses that can't be verified.
+
+   📚 What to do:
+      • Verify the domain: it must match the company
+      • Compare with official emails received in the past
+      • Look for the official contact on the company's website
+
+   ------------------------------------------------------------------
+
+======================================================================
+
+💡 GENERAL SECURITY ADVICE:
+
+   ✅ The email shows no obvious signals, but stay vigilant:
+   • Always verify the sender's identity
+   • Don't blindly trust even seemingly legitimate emails
+   • For unusual requests, verify through official channels
+        
+======================================================================
+

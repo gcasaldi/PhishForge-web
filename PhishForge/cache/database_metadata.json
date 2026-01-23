@@ -1,0 +1,12 @@
+{
+  "last_update": "2025-12-29T12:19:45.911625",
+  "total_domains": 899537,
+  "database_stats": {
+    "phishing_database": 863540,
+    "discord_scam_links": 0,
+    "steam_nitro_phishing": 0,
+    "antiscam_scamlink": 37083,
+    "scam_links_main": 10088,
+    "phish_sinking_yachts": 40257
+  }
+}

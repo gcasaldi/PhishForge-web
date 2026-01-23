@@ -1,0 +1,15 @@
+Dear valued customer,
+
+We have detected unusual login activity on your account from an unknown device in Russia.
+
+For your security, we have temporarily suspended your account. You must verify your identity immediately to restore access.
+
+Click here to verify now: http://secure-login.bit.ly/verify-account-2024
+
+Warning: If you do not verify within 12 hours, your account and all associated data will be permanently deleted!
+
+Please do not reply to this email. For assistance, contact our security team.
+
+Best regards,
+Security Department
+support@customer-security.xyz

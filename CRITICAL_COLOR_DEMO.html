@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishForge - CRITICAL Color Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        
+        .risk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 6px solid;
+        }
+        
+        .risk-critical {
+            border-color: #dc2626;
+            background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
+        }
+        
+        .risk-high {
+            border-color: #ea580c;
+            background: linear-gradient(135deg, #fff 0%, #fff7ed 100%);
+        }
+        
+        .risk-medium {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fff 0%, #fffbeb 100%);
+        }
+        
+        .risk-low {
+            border-color: #16a34a;
+            background: linear-gradient(135deg, #fff 0%, #f0fdf4 100%);
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .badge-critical {
+            background: #dc2626;
+            color: white;
+            animation: pulse-red 2s infinite;
+        }
+        
+        .badge-high {
+            background: #ea580c;
+            color: white;
+        }
+        
+        .badge-medium {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .badge-low {
+            background: #16a34a;
+            color: white;
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+            }
+        }
+        
+        .risk-score {
+            font-size: 48px;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+        
+        .score-critical { color: #dc2626; }
+        .score-high { color: #ea580c; }
+        .score-medium { color: #f59e0b; }
+        .score-low { color: #16a34a; }
+        
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 40px;
+        }
+        
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+        
+        .api-response {
+            background: #1f2937;
+            color: #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+        
+        .json-key { color: #60a5fa; }
+        .json-string { color: #fbbf24; }
+        .json-number { color: #f87171; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ PhishForge - CRITICAL Color Demo</h1>
+    
+    <div class="risk-card risk-critical">
+        <div class="demo-title">🚨 CRITICAL THREAT (Score: 90-100)</div>
+        <span class="risk-badge badge-critical">🚨 CRITICAL</span>
+        <div class="risk-score score-critical">95</div>
+        <p><strong>ROSSO INTENSO</strong> - Minaccia immediata!</p>
+        <p>🚨 CRITICAL THREAT: Delete immediately. Do NOT click links or open attachments.</p>
+        
+        <div class="api-response">
+<span class="json-key">"risk_level"</span>: <span class="json-string">"CRITICAL"</span>,
+<span class="json-key">"risk_score"</span>: <span class="json-number">95</span>,
+<span class="json-key">"risk_color"</span>: <span class="json-string">"#dc2626"</span>,
+<span class="json-key">"risk_icon"</span>: <span class="json-string">"🚨"</span>
+        </div>
+    </div>
+    
+    <div class="risk-card risk-high">
+        <div class="demo-title">⚠️ HIGH RISK (Score: 70-89)</div>
+        <span class="risk-badge badge-high">⚠️ HIGH</span>
+        <div class="risk-score score-high">75</div>
+        <p><strong>ARANCIONE</strong> - Alto rischio</p>
+        <p>🚨 HIGH RISK: Do not click any links or provide personal information.</p>
+        
+        <div class="api-response">
+<span class="json-key">"risk_level"</span>: <span class="json-string">"HIGH"</span>,
+<span class="json-key">"risk_score"</span>: <span class="json-number">75</span>,
+<span class="json-key">"risk_color"</span>: <span class="json-string">"#ea580c"</span>,
+<span class="json-key">"risk_icon"</span>: <span class="json-string">"⚠️"</span>
+        </div>
+    </div>
+    
+    <div class="risk-card risk-medium">
+        <div class="demo-title">⚡ MEDIUM RISK (Score: 40-69)</div>
+        <span class="risk-badge badge-medium">⚡ MEDIUM</span>
+        <div class="risk-score score-medium">55</div>
+        <p><strong>GIALLO/AMBRA</strong> - Sospetto</p>
+        <p>⚠️ SUSPICIOUS: Verify carefully before interacting.</p>
+        
+        <div class="api-response">
+<span class="json-key">"risk_level"</span>: <span class="json-string">"MEDIUM"</span>,
+<span class="json-key">"risk_score"</span>: <span class="json-number">55</span>,
+<span class="json-key">"risk_color"</span>: <span class="json-string">"#f59e0b"</span>,
+<span class="json-key">"risk_icon"</span>: <span class="json-string">"⚡"</span>
+        </div>
+    </div>
+    
+    <div class="risk-card risk-low">
+        <div class="demo-title">✅ LOW RISK (Score: 0-39)</div>
+        <span class="risk-badge badge-low">✅ LOW</span>
+        <div class="risk-score score-low">15</div>
+        <p><strong>VERDE</strong> - Basso rischio</p>
+        <p>✅ Low risk, but stay vigilant. Always verify sender identity.</p>
+        
+        <div class="api-response">
+<span class="json-key">"risk_level"</span>: <span class="json-string">"LOW"</span>,
+<span class="json-key">"risk_score"</span>: <span class="json-number">15</span>,
+<span class="json-key">"risk_color"</span>: <span class="json-string">"#16a34a"</span>,
+<span class="json-key">"risk_icon"</span>: <span class="json-string">"✅"</span>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: white; border-radius: 12px;">
+        <h3>🚀 Performance Ottimizzate</h3>
+        <p><strong>ML scoring velocissimo:</strong> Max 20 URLs per request</p>
+        <p><strong>Response time:</strong> < 100ms nella maggior parte dei casi</p>
+        <p><strong>Non-blocking:</strong> Fallback automatici sempre attivi</p>
+        <p><strong>Color coding:</strong> Hex colors per rendering immediato nel frontend</p>
+    </div>
+</body>
+</html>
