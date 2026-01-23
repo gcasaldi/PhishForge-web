@@ -114,14 +114,14 @@ class AnalysisResponse(BaseModel):
 
 # Helper functions
 def calculate_risk_level(score: int) -> str:
-    """Calcola il livello di rischio"""
-    if score >= 80:
+    """Calcola il livello di rischio con soglie ottimizzate"""
+    if score >= 70:
         return "CRITICAL"
-    elif score >= 60:
+    elif score >= 50:
         return "HIGH"
-    elif score >= 40:
+    elif score >= 30:
         return "MEDIUM"
-    elif score >= 20:
+    elif score >= 15:
         return "LOW"
     else:
         return "SAFE"
@@ -135,7 +135,7 @@ def generate_recommendation(risk_level: str, findings: List[Dict]) -> str:
     elif risk_level == "MEDIUM":
         return "⚡ SOSPETTO - Procedi con cautela e verifica l'autenticità attraverso canali ufficiali."
     elif risk_level == "LOW":
-        return "✓ Rischio basso ma verifica sempre i link prima di cliccare."
+        return "ℹ️ Alcuni elementi richiedono attenzione - Verifica sempre i link prima di cliccare."
     else:
         return "✅ Email probabilmente sicura, ma mantieni sempre la vigilanza."
 

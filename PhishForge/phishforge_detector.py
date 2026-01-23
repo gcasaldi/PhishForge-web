@@ -1150,10 +1150,10 @@ def score_email(subject: str, sender: str, body: str):
                     "educational": EDUCATIONAL_TIPS["punycode"]
                 })
 
-        # 1) Check for phishing PHRASES first (higher weight: ~20-25 points each)
+        # 1) Check for phishing PHRASES first (higher weight: ~15-20 points each)
         phrase_hits = [phrase for phrase in PHISHING_PHRASES if phrase in full_text]
         if phrase_hits:
-            phrase_score = min(len(phrase_hits) * 22, 60)  # Cap at 60 points
+            phrase_score = min(len(phrase_hits) * 18, 55)  # Reduced from 22, cap at 55 points
             score += phrase_score
             findings.append({
                 "risk_score": phrase_score,
@@ -1162,10 +1162,11 @@ def score_email(subject: str, sender: str, body: str):
                 "educational": EDUCATIONAL_TIPS["suspicious_keywords"]
             })
 
-        # 2) Check for individual phishing KEYWORDS (~10 points each)
+        # 2) Check for individual phishing KEYWORDS (~5 points each, reduced from 10)
+        # Only count if 2+ keywords found (reduce false positives from single common words)
         keyword_hits = [kw for kw in PHISHING_KEYWORDS if kw in full_text]
-        if keyword_hits:
-            keyword_score = min(len(keyword_hits) * 10, 40)  # Cap at 40 points
+        if len(keyword_hits) >= 2:  # Require at least 2 keywords
+            keyword_score = min(len(keyword_hits) * 5, 30)  # Reduced from 10 points each, cap at 30
             score += keyword_score
             findings.append({
                 "risk_score": keyword_score,
@@ -1555,9 +1556,9 @@ def score_email(subject: str, sender: str, body: str):
             # Typosquatted extensions  
             r'\b\w+\.xlxs\b',  # xlsx misspelled
             r'\b\w+\.docm\b', r'\b\w+\.xlsm\b',  # Macro-enabled (dangerous)
-            # Executable attachments
+            # Executable attachments (specific dangerous ones only)
             r'\b\w+\.exe\b', r'\b\w+\.scr\b', r'\b\w+\.bat\b',
-            r'\b\w+\.cmd\b', r'\b\w+\.com\b', r'\b\w+\.pif\b',
+            r'\b\w+\.cmd\b', r'\b\w+\.pif\b',  # removed .com (too generic)
             r'\b\w+\.vbs\b', r'\b\w+\.js\b', r'\b\w+\.jse\b',
             r'\b\w+\.jar\b', r'\b\w+\.msi\b', r'\b\w+\.apk\b'
         ]
@@ -1650,6 +1651,127 @@ def score_email(subject: str, sender: str, body: str):
         import traceback
         traceback.print_exc()
         return fallback_result
+
+
+def analyze_email_content(subject: str, body: str, sender: str = None):
+    """
+    Wrapper function for score_email - returns dict with risk_score and findings.
+    Compatible with local_api.py expectations.
+    """
+    result = score_email(subject, sender or "", body)
+    return {
+        "risk_score": result["score"],
+        "risk_level": result["risk_level"],
+        "findings": result["findings"],
+        "urls": result["urls"],
+        "sender_info": result["sender_info"],
+        "from_phishing_database": result.get("from_phishing_database", False)
+    }
+
+
+def analyze_url(url: str):
+    """
+    Analyze a single URL for phishing indicators.
+    """
+    findings = []
+    score = 0
+    
+    try:
+        # Check phishing databases first
+        if is_url_in_phishing_database(url):
+            score += 90
+            findings.append({
+                "risk_score": 90,
+                "category": "known_phishing_url",
+                "detail": f"URL found in Phishing.Database",
+                "educational": EDUCATIONAL_TIPS.get("known_phishing_url", {
+                    "title": "🚨 Known Phishing URL",
+                    "explanation": "This URL is in known phishing databases",
+                    "tips": ["Do not visit this URL", "Report it to authorities"]
+                })
+            })
+            return {
+                "risk_score": score,
+                "risk_level": "HIGH",
+                "findings": findings,
+                "urls": [{"url": url, "risk_score": score}]
+            }
+        
+        if is_url_in_multi_database(url):
+            score += 85
+            findings.append({
+                "risk_score": 85,
+                "category": "known_phishing_url",
+                "detail": f"URL found in multi-database check",
+                "educational": EDUCATIONAL_TIPS.get("known_phishing_url", {
+                    "title": "🚨 Known Phishing URL",
+                    "explanation": "This URL is in known phishing databases",
+                    "tips": ["Do not visit this URL", "Report it to authorities"]
+                })
+            })
+            return {
+                "risk_score": score,
+                "risk_level": "HIGH",
+                "findings": findings,
+                "urls": [{"url": url, "risk_score": score}]
+            }
+        
+        # Heuristic analysis
+        parsed = urlparse(url if url.startswith('http') else f'http://{url}')
+        domain = parsed.netloc or parsed.path.split('/')[0]
+        
+        # Check for suspicious TLDs
+        tld = domain.split('.')[-1] if '.' in domain else ''
+        if tld in HIGH_RISK_TLDS:
+            score += 20
+            findings.append({
+                "risk_score": 20,
+                "category": "suspicious_tld",
+                "detail": f"High-risk TLD: .{tld}",
+                "educational": EDUCATIONAL_TIPS.get("suspicious_tld", {
+                    "title": "⚠️ Suspicious Domain Extension",
+                    "explanation": f"The .{tld} extension is commonly used in phishing",
+                    "tips": ["Verify the URL through official channels"]
+                })
+            })
+        
+        # Check for URL shorteners
+        if domain in URL_SHORTENERS:
+            score += 15
+            findings.append({
+                "risk_score": 15,
+                "category": "url_shortener",
+                "detail": f"URL shortener detected: {domain}",
+                "educational": EDUCATIONAL_TIPS.get("url_shorteners", {
+                    "title": "⚠️ URL Shortener",
+                    "explanation": "Shortened URLs hide the real destination",
+                    "tips": ["Use a URL expander service first", "Never click unknown shortened links"]
+                })
+            })
+        
+        # Determine risk level
+        if score >= 56:
+            risk_level = "HIGH"
+        elif score >= 26:
+            risk_level = "MEDIUM"
+        else:
+            risk_level = "LOW"
+        
+        return {
+            "risk_score": score,
+            "risk_level": risk_level,
+            "findings": findings,
+            "urls": [{"url": url, "risk_score": score}]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error analyzing URL: {e}")
+        return {
+            "risk_score": 0,
+            "risk_level": "LOW",
+            "findings": [],
+            "urls": [{"url": url, "risk_score": 0}]
+        }
 
 
 if __name__ == "__main__":
