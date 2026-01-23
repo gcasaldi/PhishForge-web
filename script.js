@@ -139,7 +139,7 @@ async function analyzeEmail(sender, subject, body, retryCount = 0) {
         
         // Network error handling
         if (error.name === 'TypeError' || error.name === 'AbortError') {
-            throw new Error('⚠️ Impossibile connettersi al server. Assicurati che l\'API locale sia avviata (esegui: python local_api.py)');
+            throw new Error('⚠️ Impossibile connettersi al server. Verifica la tua connessione internet.');
         }
         throw error;
     }
@@ -184,7 +184,7 @@ async function analyzeUrl(url, retryCount = 0) {
         
         // Network error handling
         if (error.name === 'TypeError' || error.name === 'AbortError') {
-            throw new Error('⚠️ Impossibile connettersi al server. Assicurati che l\'API locale sia avviata (esegui: python local_api.py)');
+            throw new Error('⚠️ Impossibile connettersi al server. Verifica la tua connessione internet.');
         }
         throw error;
     }
