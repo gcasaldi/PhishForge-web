@@ -1,25 +1,56 @@
-// API Local URL - Change to remote if needed
-const API_URL = "http://localhost:8000/analyze/email";
+// API Configuration - Intelligent fallback (Local → Remote)
+let API_URL = "http://localhost:8000/analyze/email";
+const API_HEALTH_LOCAL = "http://localhost:8000/health";
+const API_HEALTH_REMOTE = "https://phishforge-lite.onrender.com/health";
+const API_URL_REMOTE = "https://phishforge-lite.onrender.com/analyze";
 const API_TIMEOUT = 30000; // 30 seconds
+
+let isLocalAPIAvailable = false;
+let apiSource = "unknown"; // Will be "local" or "remote"
 
 // Check API availability on load
 window.addEventListener('load', checkAPIHealth);
 
 async function checkAPIHealth() {
   try {
-    const response = await fetch("http://localhost:8000/health", { 
+    // Try local API first (5 second timeout)
+    const localResponse = await fetch(API_HEALTH_LOCAL, { 
+      signal: AbortSignal.timeout(3000)
+    });
+    if (localResponse.ok) {
+      isLocalAPIAvailable = true;
+      apiSource = "local";
+      API_URL = "http://localhost:8000/analyze/email";
+      console.log("✅ API locale disponibile");
+      document.getElementById("api-status").innerHTML = '✅ API Local (Localhost)';
+      document.getElementById("api-status").className = 'api-status ready';
+      return;
+    }
+  } catch (err) {
+    console.log("ℹ️ API locale non disponibile, provo remota...");
+  }
+
+  try {
+    // Fallback to remote API
+    const remoteResponse = await fetch(API_HEALTH_REMOTE, { 
       signal: AbortSignal.timeout(5000)
     });
-    if (response.ok) {
-      console.log("✅ API local disponibile");
-      document.getElementById("api-status").innerHTML = '✅ API Local Ready';
+    if (remoteResponse.ok) {
+      isLocalAPIAvailable = false;
+      apiSource = "remote";
+      API_URL = API_URL_REMOTE;
+      console.log("✅ API remota disponibile");
+      document.getElementById("api-status").innerHTML = '✅ API Remote (Cloud)';
       document.getElementById("api-status").className = 'api-status ready';
+      return;
     }
-  } catch {
-    console.warn("⚠️ API local non disponibile - verificare che sia in esecuzione");
-    document.getElementById("api-status").innerHTML = '⚠️ API Local Not Running';
-    document.getElementById("api-status").className = 'api-status offline';
+  } catch (err) {
+    console.error("❌ Nessuna API disponibile");
   }
+
+  // Both failed
+  document.getElementById("api-status").innerHTML = '❌ API Not Available';
+  document.getElementById("api-status").className = 'api-status offline';
 }
 
 document.getElementById("analyze-form").addEventListener("submit", async (e) => {
@@ -74,7 +105,11 @@ document.getElementById("analyze-form").addEventListener("submit", async (e) => 
     if (!resp.ok) {
       const errorText = await resp.text();
       if (resp.status === 503) {
-        showError(`⚠️ Detector non disponibile. Assicurati che l'API locale sia in esecuzione: http://localhost:8000`);
+        if (apiSource === "local") {
+          showError(`⚠️ API locale non disponibile. Assicurati che sia in esecuzione: http://localhost:8000`);
+        } else {
+          showError(`⚠️ API remota temporaneamente non disponibile. Riprova tra qualche secondo.`);
+        }
       } else {
         showError(`Errore API (${resp.status}): ${errorText}`);
       }
