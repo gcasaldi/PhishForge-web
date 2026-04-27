@@ -1,8 +1,8 @@
 // API Configuration - Intelligent fallback (Local → Remote)
 let API_URL = "http://localhost:8000/analyze/email";
 const API_HEALTH_LOCAL = "http://localhost:8000/health";
-const API_HEALTH_REMOTE = "https://phishforge-lite.onrender.com/health";
-const API_URL_REMOTE = "https://phishforge-lite.onrender.com/analyze";
+const API_HEALTH_REMOTE = "https://www.virustotal.com/api/v3";
+const API_URL_REMOTE = "https://gcasaldi.github.io/PhishForge-web/PhishForge/phishforge-web/api-handler.php";
 const API_TIMEOUT = 30000; // 30 seconds
 
 let isLocalAPIAvailable = false;
@@ -13,7 +13,7 @@ window.addEventListener('load', checkAPIHealth);
 
 async function checkAPIHealth() {
   try {
-    // Try local API first (5 second timeout)
+    // Try local API first (3 second timeout)
     const localResponse = await fetch(API_HEALTH_LOCAL, { 
       signal: AbortSignal.timeout(3000)
     });
@@ -27,30 +27,15 @@ async function checkAPIHealth() {
       return;
     }
   } catch (err) {
-    console.log("ℹ️ API locale non disponibile, provo remota...");
+    console.log("ℹ️ API locale non disponibile, uso rilevamento client-side...");
   }
 
-  try {
-    // Fallback to remote API
-    const remoteResponse = await fetch(API_HEALTH_REMOTE, { 
-      signal: AbortSignal.timeout(5000)
-    });
-    if (remoteResponse.ok) {
-      isLocalAPIAvailable = false;
-      apiSource = "remote";
-      API_URL = API_URL_REMOTE;
-      console.log("✅ API remota disponibile");
-      document.getElementById("api-status").innerHTML = '✅ API Remote (Cloud)';
-      document.getElementById("api-status").className = 'api-status ready';
-      return;
-    }
-  } catch (err) {
-    console.error("❌ Nessuna API disponibile");
-  }
-
-  // Both failed
-  document.getElementById("api-status").innerHTML = '❌ API Not Available';
-  document.getElementById("api-status").className = 'api-status offline';
+  // Use client-side detection (no remote API needed)
+  isLocalAPIAvailable = false;
+  apiSource = "client";
+  console.log("✅ API client-side disponibile");
+  document.getElementById("api-status").innerHTML = '✅ Client-Side Detection';
+  document.getElementById("api-status").className = 'api-status ready';
 }
 
 document.getElementById("analyze-form").addEventListener("submit", async (e) => {
@@ -74,59 +59,267 @@ document.getElementById("analyze-form").addEventListener("submit", async (e) => 
   resultContent.innerHTML = '<div class="loading">🔍 Analizzando email...</div>';
 
   try {
-    // Build request payload for local API
-    const payload = {
-      subject: subject || "No subject",
-      sender: sender || "unknown@example.com",
-      body: body || "No body content"
-    };
+    let result;
     
-    // Add attachment if provided
-    if (attachment_filename.trim()) {
-      payload.attachments = [{
-        filename: attachment_filename.trim(),
-        mime_type: getMimeType(attachment_filename),
-        size: 0
-      }];
+    // Use appropriate API based on availability
+    if (apiSource === "local") {
+      // Local API
+      result = await analyzeWithLocalAPI(subject, sender, body, attachment_filename);
+    } else {
+      // Client-side detection (works everywhere)
+      result = analyzeClientSide(subject, sender, body, attachment_filename);
     }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
-
-    const resp = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!resp.ok) {
-      const errorText = await resp.text();
-      if (resp.status === 503) {
-        if (apiSource === "local") {
-          showError(`⚠️ API locale non disponibile. Assicurati che sia in esecuzione: http://localhost:8000`);
-        } else {
-          showError(`⚠️ API remota temporaneamente non disponibile. Riprova tra qualche secondo.`);
-        }
-      } else {
-        showError(`Errore API (${resp.status}): ${errorText}`);
-      }
-      return;
-    }
-
-    const data = await resp.json();
-    displayResults(data);
+    
+    displayResults(result);
 
   } catch (err) {
     if (err.name === 'AbortError') {
       showError(`⏱️ Timeout - L'API locale impiega troppo tempo a rispondere. Verifica che sia in esecuzione.`);
     } else {
-      showError(`❌ Errore di rete: ${err.message}. Assicurati che l'API locale sia in esecuzione su http://localhost:8000`);
+      showError(`❌ Errore di analisi: ${err.message}`);
     }
   }
 });
+
+async function analyzeWithLocalAPI(subject, sender, body, attachment_filename) {
+  const payload = {
+    subject: subject || "No subject",
+    sender: sender || "unknown@example.com",
+    body: body || "No body content"
+  };
+  
+  if (attachment_filename.trim()) {
+    payload.attachments = [{
+      filename: attachment_filename.trim(),
+      mime_type: getMimeType(attachment_filename),
+      size: 0
+    }];
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  const resp = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    signal: controller.signal
+  });
+
+  clearTimeout(timeoutId);
+
+  if (!resp.ok) {
+    const errorText = await resp.text();
+    if (resp.status === 503) {
+      showError(`⚠️ API locale non disponibile. Assicurati che sia in esecuzione: http://localhost:8000`);
+    } else {
+      showError(`Errore API (${resp.status}): ${errorText}`);
+    }
+    throw new Error("API response error");
+  }
+
+  return await resp.json();
+}
+
+function analyzeClientSide(subject, sender, body, attachment_filename) {
+  """
+  Rilevamento phishing client-side - Non richiede API esterna
+  """
+  let riskScore = 0;
+  let findings = [];
+
+  // ANALISI MITTENTE
+  const senderLower = sender.toLowerCase();
+  
+  // Check for domains che impersonano
+  const fakeDomainsPatterns = [
+    /paypal.*verify|verify.*paypal/i,
+    /amazon.*security|security.*amazon/i,
+    /bank.*urgent|urgent.*bank/i,
+    /apple.*account|account.*apple/i,
+    /microsoft.*confirm|confirm.*microsoft/i,
+    /google.*verify|verify.*google/i,
+    /(-|_)(paypal|amazon|apple|bank|security|account)/i,
+  ];
+
+  for (let pattern of fakeDomainsPatterns) {
+    if (pattern.test(senderLower)) {
+      riskScore += 25;
+      findings.push({
+        risk_score: 25,
+        category: "spoofing",
+        detail: `⚠️ Indirizzo mittente sospetto: contiene pattern riconoscibile come phishing`
+      });
+      break;
+    }
+  }
+
+  // Check for suspicious sender patterns
+  if (senderLower.includes("noreply") && senderLower.includes("bit.ly")) {
+    riskScore += 15;
+    findings.push({
+      risk_score: 15,
+      category: "sender",
+      detail: "📧 Mittente automatico con URL abbreviato"
+    });
+  }
+
+  // ANALISI SUBJECT
+  const subjectLower = subject.toLowerCase();
+  const urgentKeywords = ["urgent", "immediate", "verify", "confirm", "action required", "suspended", "locked", "compromised"];
+  const urgentScore = urgentKeywords.filter(k => subjectLower.includes(k)).length;
+  
+  if (urgentScore >= 2) {
+    riskScore += 20;
+    findings.push({
+      risk_score: 20,
+      category: "suspicious_keywords",
+      detail: `🚩 Linguaggio urgente rilevato (${urgentScore} parole sospette)`
+    });
+  } else if (urgentScore >= 1) {
+    riskScore += 10;
+    findings.push({
+      risk_score: 10,
+      category: "suspicious_keywords",
+      detail: "⚠️ Parole urgenti nel subject"
+    });
+  }
+
+  // ANALISI BODY
+  const bodyLower = body.toLowerCase();
+
+  // Extract URLs
+  const urlRegex = /(?:https?:\/\/)?(?:www\.)?[^\s]+\.[^\s]+/gi;
+  const urls = body.match(urlRegex) || [];
+  const uniqueUrls = [...new Set(urls)];
+
+  // Check URLs
+  let urlRiskScore = 0;
+  const suspiciousUrlPatterns = [
+    /bit\.ly|tinyurl|short\.link|goo\.gl/i,  // URL shorteners
+    /paypal.*verify|verify.*paypal|paypal[-_]security|secure[-_]paypal/i,
+    /amazon[-_](verify|secure|account)|amazon.*login/i,
+    /apple[-_](verify|account|security)/i,
+    /bank(-verify|[-_]security|[-_]login)/i,
+    /dhl[-_]?tracking|fedex[-_]?tracking|ups[-_]?tracking/i,
+  ];
+
+  uniqueUrls.forEach(url => {
+    let urlScore = 0;
+    
+    // Check suspicious patterns
+    for (let pattern of suspiciousUrlPatterns) {
+      if (pattern.test(url)) {
+        urlScore += 30;
+        break;
+      }
+    }
+    
+    // Check for HTTP (not HTTPS)
+    if (url.startsWith("http://") && !url.includes("localhost")) {
+      urlScore += 15;
+    }
+    
+    // Check for IP instead of domain
+    if (/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(url)) {
+      urlScore += 25;
+    }
+    
+    urlRiskScore = Math.max(urlRiskScore, urlScore);
+  });
+
+  if (urlRiskScore > 0) {
+    riskScore += urlRiskScore;
+    findings.push({
+      risk_score: urlRiskScore,
+      category: "phishing_urls",
+      detail: `🔗 URL sospetto rilevato (score: ${urlRiskScore})`
+    });
+  }
+
+  // Check phishing keywords in body
+  const phishingKeywords = [
+    "click here", "verify account", "confirm identity", "update payment",
+    "urgent action", "account compromised", "suspicious activity",
+    "click immediately", "verify now", "confirm password", "update your account",
+    "claim reward", "collect prize"
+  ];
+
+  const keywordCount = phishingKeywords.filter(k => bodyLower.includes(k)).length;
+  if (keywordCount > 0) {
+    const keywordScore = Math.min(20, keywordCount * 5);
+    riskScore += keywordScore;
+    findings.push({
+      risk_score: keywordScore,
+      category: "suspicious_keywords",
+      detail: `🚩 ${keywordCount} parole phishing rilevate nel corpo`
+    });
+  }
+
+  // ANALISI ALLEGATI
+  if (attachment_filename.trim()) {
+    const attachmentLower = attachment_filename.toLowerCase();
+    const dangerousExtensions = [".exe", ".scr", ".dll", ".vbs", ".bat", ".cmd", ".msi"];
+    
+    // Check for dangerous extensions
+    for (let ext of dangerousExtensions) {
+      if (attachmentLower.endsWith(ext)) {
+        riskScore += 35;
+        findings.push({
+          risk_score: 35,
+          category: "attachment",
+          detail: `⚠️ ATTENZIONE! Allegato eseguibile pericoloso (${ext})`
+        });
+        break;
+      }
+    }
+    
+    // Check for compound extensions (e.g., .pdf.exe)
+    if (/\.\w+\.\w+$/.test(attachment_filename)) {
+      riskScore += 25;
+      findings.push({
+        risk_score: 25,
+        category: "attachment",
+        detail: "📎 Allegato con estensione compound (molto sospetto)"
+      });
+    }
+  }
+
+  // Clamp risk score to 100
+  riskScore = Math.min(100, riskScore);
+
+  // Determine risk level
+  let riskLevel = "SAFE";
+  if (riskScore >= 70) riskLevel = "CRITICAL";
+  else if (riskScore >= 50) riskLevel = "HIGH";
+  else if (riskScore >= 30) riskLevel = "MEDIUM";
+  else if (riskScore >= 15) riskLevel = "LOW";
+
+  // Generate recommendation
+  let recommendation = "";
+  if (riskLevel === "CRITICAL") {
+    recommendation = "🚨 PHISHING CONFERMATO - Elimina immediatamente questa email e NON cliccare su nessun link!";
+  } else if (riskLevel === "HIGH") {
+    recommendation = "⚠️ ALTA PROBABILITÀ DI PHISHING - Verifica attentamente il mittente e NON fornire dati personali!";
+  } else if (riskLevel === "MEDIUM") {
+    recommendation = "⚡ SOSPETTO - Procedi con cautela e verifica l'autenticità attraverso canali ufficiali.";
+  } else if (riskLevel === "LOW") {
+    recommendation = "ℹ️ Alcuni elementi richiedono attenzione - Verifica sempre i link prima di cliccare.";
+  } else {
+    recommendation = "✅ Email probabilmente sicura, ma mantieni sempre la vigilanza.";
+  }
+
+  return {
+    risk_score: riskScore,
+    risk_level: riskLevel,
+    risk_percentage: riskScore,
+    findings: findings,
+    urls: uniqueUrls.map(url => ({ url, risk_score: urlRiskScore })),
+    recommendation: recommendation,
+    ml_score: null,
+    attachment_score: null
+  };
+}
 
 function getMimeType(filename) {
   const ext = filename.split('.').pop().toLowerCase();
