@@ -24,37 +24,39 @@ logger = logging.getLogger(__name__)
 
 class MultiDatabaseClient:
     """Consolidates multiple phishing databases for comprehensive protection"""
-    
-    # Database sources
+
+    # Public feeds that are currently available and produce useful phishing-domain coverage.
+    # Some historical feeds were removed or changed location; we intentionally keep the
+    # client resilient so a single dead source does not disable the whole detector.
     DATABASES = {
         "phishing_database": {
             "url": "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
-            "timeout": 5,
+            "timeout": 10,
             "type": "list"
         },
-        "discord_scam_links": {
-            "url": "https://raw.githubusercontent.com/nikolaischunk/discord-scam-links/main/src/links.json",
-            "timeout": 5,
-            "type": "json"
+        "urlhaus": {
+            "url": "https://urlhaus.abuse.ch/downloads/text/",
+            "timeout": 10,
+            "type": "list"
         },
-        "steam_nitro_phishing": {
-            "url": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/master/Random/SteamNitroPhishing.txt",
-            "timeout": 5,
+        "openphish": {
+            "url": "https://openphish.com/feed.txt",
+            "timeout": 10,
             "type": "list"
         },
         "antiscam_scamlink": {
             "url": "https://raw.githubusercontent.com/Dogino/Discord-Phishing-URLs/main/scam-urls.txt",
-            "timeout": 5,
+            "timeout": 10,
             "type": "list"
         },
         "scam_links_main": {
             "url": "https://raw.githubusercontent.com/DevSpen/scam-links/master/src/links.txt",
-            "timeout": 5,
+            "timeout": 10,
             "type": "list"
         },
         "phish_sinking_yachts": {
             "url": "https://phish.sinking.yachts/v2/all",
-            "timeout": 5,
+            "timeout": 10,
             "type": "json_array"
         }
     }
