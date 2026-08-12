@@ -9,9 +9,9 @@ const examples = {
         body: 'Your PayPal account has been locked due to suspicious activity.\n\nClick here immediately to verify your identity: http://bit.ly/paypal-verify-now\n\nWARNING: You have only 24 hours before permanent suspension!\n\nFailure to verify will result in account closure.'
     },
     legitimate: {
-        sender: 'Company Newsletter <newsletter@company.com>',
-        subject: 'Monthly Newsletter - November 2025',
-        body: 'Hello valued customer,\n\nHere is our monthly newsletter with updates and news about our services.\n\nVisit our website for more information: https://www.company.com\n\nBest regards,\nThe Team'
+        sender: 'Acme Team <team@company.com>',
+        subject: 'Weekly project update - Friday review',
+        body: 'Hi everyone,\n\nThank you for your work this week.\n\nHere is the summary of the project progress and the action items for next week.\n\nPlease review the notes before Friday’s meeting.\n\nBest regards,\nMaria Lopez\nOperations Team'
     },
     phishingUrl: 'http://paypal-verify.xyz/account/login',
     legitimateUrl: 'https://www.paypal.com'
