@@ -6,26 +6,37 @@
 }
 
 :root {
-    --page-bg: #f4f7fb;
-    --panel-bg: #ffffff;
-    --panel-alt: #eef4ff;
-    --panel-soft: #f8fafc;
-    --primary: #2563eb;
-    --primary-soft: rgba(37, 99, 235, 0.12);
-    --primary-strong: #1d4ed8;
-    --danger: #dc2626;
-    --warning: #d97706;
-    --success: #16a34a;
-    --text-primary: #111827;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --border: #dfe7f5;
-    --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.08);
+    --page-bg: #050b16;
+    --panel-bg: rgba(12, 20, 32, 0.78);
+    --panel-alt: rgba(15, 28, 43, 0.92);
+    --panel-soft: rgba(17, 29, 44, 0.88);
+    --primary: #6bb6ff;
+    --primary-soft: rgba(107, 182, 255, 0.16);
+    --primary-strong: #4e8dff;
+    --danger: #ff5d8f;
+    --warning: #ffb454;
+    --success: #4ade80;
+    --text-primary: #edf6ff;
+    --text-secondary: #b8c9e3;
+    --text-muted: #88a0c2;
+    --border: rgba(136, 171, 211, 0.22);
+    --border-glow: rgba(107, 182, 255, 0.42);
+    --shadow-soft: 0 24px 70px rgba(2, 6, 23, 0.55);
+    --dark-card: #0b1628;
+    --darker-card: #0f1d31;
+    --neon-blue: #67d7ff;
+    --neon-blue-glow: rgba(103, 215, 255, 0.45);
+    --success-color: #4ade80;
+    --warning-color: #ffb454;
+    --danger-color: #ff5d8f;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(180deg, #f8fbff 0%, #eef3fb 100%);
+    background:
+        radial-gradient(circle at top left, rgba(92, 154, 255, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(79, 244, 255, 0.12), transparent 24%),
+        linear-gradient(180deg, #050b16 0%, #08131f 38%, #050c17 100%);
     min-height: 100vh;
     padding: 0;
     color: var(--text-primary);
@@ -92,10 +103,10 @@ body::before {
 
 .header-title {
     font-size: 42px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text-primary);
-    text-shadow: 0 0 20px var(--neon-blue-glow);
-    letter-spacing: 2px;
+    text-shadow: 0 0 24px rgba(103, 215, 255, 0.32);
+    letter-spacing: 1.5px;
 }
 
 @keyframes fadeInDown {
@@ -128,20 +139,22 @@ body::before {
 }
 
 .hero-title {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--neon-blue);
-    margin-bottom: 16px;
-    text-shadow: 0 0 20px var(--neon-blue-glow), 0 0 40px rgba(0, 212, 255, 0.3);
-    line-height: 1.3;
+    font-size: clamp(2.2rem, 4vw, 4rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 18px;
+    text-shadow: 0 0 24px rgba(103, 215, 255, 0.32), 0 0 46px rgba(103, 215, 255, 0.18);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
 }
 
 .hero-subtitle {
     font-size: 18px;
     color: var(--text-secondary);
-    max-width: 700px;
+    max-width: 720px;
     margin: 0 auto;
-    line-height: 1.6;
+    line-height: 1.7;
+    text-shadow: 0 0 18px rgba(103, 215, 255, 0.12);
 }
 
 /* Real-Time Statistics Dashboard */
@@ -371,14 +384,16 @@ body::before {
 
 /* Card */
 .card {
-    background: var(--panel-bg);
-    border-radius: 20px;
-    padding: 32px;
+    background: linear-gradient(180deg, rgba(12, 20, 32, 0.88), rgba(10, 17, 27, 0.92));
+    border-radius: 22px;
+    padding: 30px;
     margin-bottom: 28px;
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     animation: fadeInUp 0.8s ease-out;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     position: relative;
     overflow: hidden;
 }
@@ -390,13 +405,14 @@ body::before {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary), transparent);
-    opacity: 0.7;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    opacity: 0.9;
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 20px 50px rgba(3, 8, 20, 0.5);
+    border-color: var(--border-glow);
 }
 
 .card h2, .card h3 {
@@ -445,9 +461,10 @@ body::before {
 }
 
 .tab-btn.active {
-    color: #fff;
-    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+    color: #04121e;
+    background: linear-gradient(135deg, var(--neon-blue), #a9d8ff 70%);
+    box-shadow: 0 12px 28px rgba(103, 215, 255, 0.25);
+    font-weight: 700;
 }
 
 .tab-btn i {
@@ -486,22 +503,23 @@ body::before {
 .form-group input,
 .form-group textarea {
     width: 100%;
-    padding: 14px 18px;
-    background: var(--darker-card);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
+    padding: 15px 18px;
+    background: rgba(8, 15, 25, 0.9);
+    border: 1px solid rgba(136, 171, 211, 0.22);
+    border-radius: 14px;
     color: var(--text-primary);
     font-size: 15px;
     font-family: inherit;
     transition: all 0.3s ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
     border-color: var(--neon-blue);
-    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1), 0 0 20px rgba(0, 212, 255, 0.2);
-    background: var(--dark-card);
+    box-shadow: 0 0 0 3px rgba(103, 215, 255, 0.12), 0 0 24px rgba(103, 215, 255, 0.18);
+    background: rgba(11, 18, 29, 0.96);
 }
 
 .form-group input::placeholder,
@@ -534,11 +552,12 @@ body::before {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--neon-blue), var(--primary-strong));
+    color: #04131d;
     width: 100%;
     justify-content: center;
-    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 14px 30px rgba(103, 215, 255, 0.22);
+    font-weight: 800;
 }
 
 .btn-primary::before {
@@ -691,18 +710,21 @@ body::before {
 }
 
 .status-pill.good {
-    background: rgba(22, 163, 74, 0.12);
+    background: rgba(74, 222, 128, 0.12);
     color: var(--success);
+    box-shadow: 0 0 18px rgba(74, 222, 128, 0.18);
 }
 
 .status-pill.bad {
-    background: rgba(220, 38, 38, 0.1);
+    background: rgba(255, 93, 143, 0.12);
     color: var(--danger);
+    box-shadow: 0 0 18px rgba(255, 93, 143, 0.18);
 }
 
 .status-pill.neutral {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
+    background: rgba(103, 215, 255, 0.12);
+    color: var(--neon-blue);
+    box-shadow: 0 0 18px rgba(103, 215, 255, 0.16);
 }
 
 .feed-sources {
