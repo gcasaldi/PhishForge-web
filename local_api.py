@@ -65,6 +65,15 @@ except ImportError:
         return {"attachment_score": 0, "attachment_details": {}, "findings": []}
     logger.warning("✗ Attachment analyzer non disponibile")
 
+try:
+    from PhishForge.multi_database_client import get_client as get_multi_db_client
+    MULTI_DB_AVAILABLE = True
+except ImportError:
+    MULTI_DB_AVAILABLE = False
+    def get_multi_db_client():
+        return None
+    logger.warning("✗ Multi-database client non disponibile")
+
 # Inizializza FastAPI
 app = FastAPI(
     title="PhishForge Local API",
@@ -298,6 +307,53 @@ async def get_stats():
             "ml_email": EMAIL_ML_AVAILABLE,
             "attachment": ATTACHMENT_ANALYZER_AVAILABLE
         }
+    }
+
+@app.get("/db-status")
+@app.get("/db/status")
+async def get_db_status():
+    """Return current phishing feed status and stats."""
+    if not MULTI_DB_AVAILABLE:
+        return {"status": "offline", "total_domains": 0, "last_update": None, "sources": []}
+
+    client = get_multi_db_client()
+    stats = client.get_stats()
+    status = "online" if stats.get("total_domains", 0) > 0 else "offline"
+    return {
+        "status": status,
+        "total_domains": stats.get("total_domains", 0),
+        "last_update": stats.get("last_update"),
+        "sources": list(stats.get("databases", {}).keys()) or [
+            "Phishing.Database",
+            "Discord scam links",
+            "Steam Nitro phishing",
+            "Scam links",
+            "phish.sinking.yachts"
+        ]
+    }
+
+@app.post("/db-refresh")
+@app.post("/db/refresh")
+async def refresh_db_status():
+    """Refresh all phishing feeds and return updated stats."""
+    if not MULTI_DB_AVAILABLE:
+        return {"status": "offline", "total_domains": 0, "last_update": None, "sources": []}
+
+    client = get_multi_db_client()
+    update = client.update_databases(force=True)
+    stats = client.get_stats()
+    return {
+        "status": "online" if stats.get("total_domains", 0) > 0 else "offline",
+        "total_domains": stats.get("total_domains", 0),
+        "last_update": stats.get("last_update"),
+        "sources": list(stats.get("databases", {}).keys()) or [
+            "Phishing.Database",
+            "Discord scam links",
+            "Steam Nitro phishing",
+            "Scam links",
+            "phish.sinking.yachts"
+        ],
+        "update": update
     }
 
 if __name__ == "__main__":

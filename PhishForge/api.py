@@ -28,12 +28,25 @@ app.add_middleware(
         "https://gcasaldi.github.io",
         "http://localhost:3000",
         "http://localhost:8000",
-        "http://127.0.0.1:5500"  # Per Live Server in sviluppo
+        "http://127.0.0.1:5500",
+        "http://127.0.0.1:8000",
+        "http://localhost"
     ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
+
+try:
+    from multi_database_client import get_client as get_multi_db_client
+    MULTI_DB_AVAILABLE = True
+except ImportError:
+    try:
+        from PhishForge.multi_database_client import get_client as get_multi_db_client
+        MULTI_DB_AVAILABLE = True
+    except ImportError:
+        MULTI_DB_AVAILABLE = False
+        get_multi_db_client = None
 
 # Models
 class EmailAnalysisRequest(BaseModel):
@@ -130,6 +143,50 @@ async def analyze_email(request: EmailAnalysisRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during analysis: {str(e)}")
+
+@app.get("/db-status")
+async def get_db_status():
+    """Return phishing feed status and known domains count."""
+    if not MULTI_DB_AVAILABLE or get_multi_db_client is None:
+        return {"status": "offline", "total_domains": 0, "last_update": None, "sources": []}
+
+    client = get_multi_db_client()
+    stats = client.get_stats()
+    return {
+        "status": "online" if stats.get("total_domains", 0) > 0 else "offline",
+        "total_domains": stats.get("total_domains", 0),
+        "last_update": stats.get("last_update"),
+        "sources": list(stats.get("databases", {}).keys()) or [
+            "Phishing.Database",
+            "Discord scam links",
+            "Steam Nitro phishing",
+            "Scam links",
+            "phish.sinking.yachts"
+        ]
+    }
+
+@app.post("/db-refresh")
+async def refresh_db_status():
+    """Force refresh of phishing source feeds and return updated stats."""
+    if not MULTI_DB_AVAILABLE or get_multi_db_client is None:
+        return {"status": "offline", "total_domains": 0, "last_update": None, "sources": []}
+
+    client = get_multi_db_client()
+    update = client.update_databases(force=True)
+    stats = client.get_stats()
+    return {
+        "status": "online" if stats.get("total_domains", 0) > 0 else "offline",
+        "total_domains": stats.get("total_domains", 0),
+        "last_update": stats.get("last_update"),
+        "sources": list(stats.get("databases", {}).keys()) or [
+            "Phishing.Database",
+            "Discord scam links",
+            "Steam Nitro phishing",
+            "Scam links",
+            "phish.sinking.yachts"
+        ],
+        "update": update
+    }
 
 @app.get("/keywords")
 async def get_suspicious_keywords():

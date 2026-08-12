@@ -24,13 +24,13 @@ const loading = document.getElementById('loading');
 const results = document.getElementById('results');
 const analyzeBtn = document.getElementById('analyzeBtn');
 const analyzeUrlBtn = document.getElementById('analyzeUrlBtn');
+const dbStatusPill = document.getElementById('dbStatusPill');
+const dbDomainCount = document.getElementById('dbDomainCount');
+const dbLastUpdated = document.getElementById('dbLastUpdated');
+const feedSourceList = document.getElementById('feedSourceList');
 
 // Current mode
 let currentMode = 'email';
-
-// Event Listeners
-form.addEventListener('submit', handleSubmit);
-urlForm.addEventListener('submit', handleUrlSubmit);
 
 // Event Listeners
 form.addEventListener('submit', handleSubmit);
@@ -767,5 +767,80 @@ async function checkApiHealth() {
     }
 }
 
+async function refreshThreatFeeds(forceRefresh = false) {
+    if (!dbStatusPill || !dbDomainCount || !dbLastUpdated) {
+        return;
+    }
+
+    dbStatusPill.textContent = 'Checking...';
+    dbStatusPill.className = 'status-pill neutral';
+    dbDomainCount.textContent = '--';
+    dbLastUpdated.textContent = '--';
+
+    const endpoints = [
+        'https://phishforge-lite.onrender.com/db-status',
+        'http://127.0.0.1:8000/db-status'
+    ];
+
+    const endpointPath = forceRefresh ? 'db-refresh' : 'db-status';
+
+    try {
+        let payload = null;
+        let lastError = null;
+
+        for (const entry of endpoints) {
+            const baseUrl = entry.endsWith('/db-status') ? entry.replace(/\/db-status$/, '') : entry;
+            const url = `${baseUrl}/${endpointPath}`;
+            try {
+                const response = await fetch(url, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                payload = await response.json();
+                break;
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        if (!payload) {
+            throw lastError || new Error('No feed status available');
+        }
+
+        const totalDomains = Number(payload.total_domains || 0);
+        const lastUpdate = payload.last_update || 'Unavailable';
+
+        if (payload.status === 'online' && totalDomains > 0) {
+            dbStatusPill.textContent = 'Online';
+            dbStatusPill.className = 'status-pill good';
+            dbDomainCount.textContent = `${totalDomains.toLocaleString()}+`;
+            dbLastUpdated.textContent = lastUpdate;
+        } else {
+            dbStatusPill.textContent = 'Offline';
+            dbStatusPill.className = 'status-pill bad';
+            dbDomainCount.textContent = 'Unavailable';
+            dbLastUpdated.textContent = 'Offline';
+        }
+
+        if (feedSourceList) {
+            const sources = payload.sources && payload.sources.length ? payload.sources : [
+                'Phishing.Database',
+                'Discord scam links',
+                'Steam Nitro phishing',
+                'Scam links',
+                'phish.sinking.yachts'
+            ];
+            feedSourceList.innerHTML = sources.map(item => `<li>${item}</li>`).join('');
+        }
+    } catch (error) {
+        console.warn('Threat feed status unavailable:', error);
+        dbStatusPill.textContent = 'Offline';
+        dbStatusPill.className = 'status-pill bad';
+        dbDomainCount.textContent = 'Unavailable';
+        dbLastUpdated.textContent = 'Offline';
+    }
+}
+
 // Execute health check
 checkApiHealth();
+refreshThreatFeeds();

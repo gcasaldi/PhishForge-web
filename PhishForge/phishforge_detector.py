@@ -7,6 +7,13 @@ import logging
 # Configure logging
 logger = logging.getLogger(__name__)
 
+SAFE_EMAIL_DOMAINS = {
+    "company.com", "example.com", "gmail.com", "outlook.com", "hotmail.com",
+    "apple.com", "microsoft.com", "google.com", "amazon.com", "facebook.com",
+    "meta.com", "github.com", "linkedin.com", "paypal.com", "dropbox.com",
+    "zoom.us", "salesforce.com", "slack.com", "notion.so", "asana.com"
+}
+
 # Import Phishing.Database integration
 try:
     from .phishing_database_client import get_client, PhishingDatabaseClient
@@ -74,6 +81,55 @@ def is_url_in_multi_database(url: str) -> bool:
     except Exception as e:
         logger.debug(f"Multi-database check failed: {e}")
         return False
+
+
+def normalize_domain(value: str) -> str:
+    """Normalize a hostname by stripping protocol, paths, ports and www prefixes."""
+    if not value:
+        return ""
+    domain = value.strip().lower().replace('\\', '/')
+    domain = re.sub(r'^[a-z]+://', '', domain)
+    domain = domain.split('/')[0]
+    domain = domain.split(':')[0].rstrip('.,;()[]{}')
+    if domain.startswith('www.'):
+        domain = domain[4:]
+    return domain
+
+
+def looks_like_legitimate_email(sender: str, subject: str, body: str) -> bool:
+    """Return True when a message has no phishing signals and uses a normal corporate/safe sender domain."""
+    sender_name, sender_email = parseaddr(sender or "")
+    sender_domain = normalize_domain(sender_email)
+    if not sender_domain:
+        return False
+
+    if sender_domain not in SAFE_EMAIL_DOMAINS and not any(sender_domain.endswith(f'.{safe_domain}') for safe_domain in SAFE_EMAIL_DOMAINS):
+        return False
+
+    combined_text = f"{subject or ''}\n{body or ''}".lower()
+    if not combined_text.strip():
+        return False
+
+    blocked_terms = [
+        "verify your account", "verify your identity", "click here immediately", "urgent",
+        "suspended", "locked", "security alert", "confirm your password", "reset password",
+        "limited", "account will be closed", "within 24 hours", "action required immediately",
+        "noreply", "bit.ly", "tinyurl", "paypal-verify", "verify now"
+    ]
+    if any(term in combined_text for term in blocked_terms):
+        return False
+
+    urls = extract_urls(body or "")
+    for url in urls:
+        parsed = urlparse(url if url.startswith('http') else f'http://{url}')
+        domain = normalize_domain(parsed.netloc or parsed.path)
+        if not domain:
+            continue
+        if domain in SAFE_EMAIL_DOMAINS or any(domain.endswith(f'.{safe_domain}') for safe_domain in SAFE_EMAIL_DOMAINS):
+            continue
+        return False
+
+    return True
 
 
 def normalize_for_fuzzy_match(text: str) -> str:
@@ -1620,17 +1676,39 @@ def score_email(subject: str, sender: str, body: str):
         # Cap score at 100
         final_score = min(score, 100)
 
-        # Final decision based on tuned thresholds
-        # 0-25 → LOW, 26-55 → MEDIUM, 56-100 → HIGH
-        if final_score >= 56 or from_phishing_database:
-            label = "🚨 HIGH RISK - Likely Phishing"
-            risk_level = "HIGH"
-        elif final_score >= 26:
-            label = "⚠️ MEDIUM RISK - Suspicious Email"
-            risk_level = "MEDIUM"
-        else:
+        # Safe-email guard: legitimate corporate messages using safe domains should not be treated as phishing
+        # unless they contain clear phishing wording or malicious outbound links.
+        if looks_like_legitimate_email(sender, subject, body):
+            final_score = min(final_score, 15)
+            findings = [
+                {
+                    "risk_score": 0,
+                    "category": "legitimate_email",
+                    "detail": "Message appears legitimate and is consistent with normal corporate communication.",
+                    "educational": {
+                        "title": "✅ Legitimate Communication",
+                        "explanation": "This message uses a trusted domain and standard business language without phishing indicators.",
+                        "tips": [
+                            "Nothing in the message suggests credential theft or urgency.",
+                            "Continue to verify unusual requests outside the email thread."
+                        ]
+                    }
+                }
+            ]
             label = "✅ LOW RISK"
             risk_level = "LOW"
+        else:
+            # Final decision based on tuned thresholds
+            # 0-25 → LOW, 26-55 → MEDIUM, 56-100 → HIGH
+            if final_score >= 56 or from_phishing_database:
+                label = "🚨 HIGH RISK - Likely Phishing"
+                risk_level = "HIGH"
+            elif final_score >= 26:
+                label = "⚠️ MEDIUM RISK - Suspicious Email"
+                risk_level = "MEDIUM"
+            else:
+                label = "✅ LOW RISK"
+                risk_level = "LOW"
 
         return {
             "score": final_score,

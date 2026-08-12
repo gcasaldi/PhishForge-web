@@ -232,6 +232,42 @@
             </div>
         </div>
 
+        <!-- Threat Feed Status -->
+        <div class="card threat-feed-card">
+            <div class="section-header-row">
+                <h3><i class="fas fa-shield-virus"></i> Threat Feed Status</h3>
+                <button class="btn btn-secondary btn-small" id="refreshDbBtn" type="button" onclick="refreshThreatFeeds()">
+                    <i class="fas fa-arrows-rotate"></i> Aggiorna database
+                </button>
+            </div>
+
+            <div class="status-grid">
+                <div class="status-pill-item">
+                    <span class="status-label">Feed</span>
+                    <span class="status-pill" id="dbStatusPill">Checking...</span>
+                </div>
+                <div class="status-pill-item">
+                    <span class="status-label">Domains</span>
+                    <strong id="dbDomainCount">--</strong>
+                </div>
+                <div class="status-pill-item">
+                    <span class="status-label">Updated</span>
+                    <strong id="dbLastUpdated">--</strong>
+                </div>
+            </div>
+
+            <div class="feed-sources">
+                <h4>Sources</h4>
+                <ul id="feedSourceList">
+                    <li>Phishing.Database</li>
+                    <li>Discord scam links</li>
+                    <li>Steam Nitro phishing</li>
+                    <li>Scam links</li>
+                    <li>phish.sinking.yachts</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer class="footer">
             <p>© 2025 – PhishForge – Giulia Casaldi</p>
